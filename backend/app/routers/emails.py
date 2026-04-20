@@ -25,6 +25,7 @@ class SendRequest(BaseModel):
     from_name: str
     from_email: str
     emails: List[dict]        # [{to, subject, body, contact_name}]
+    resume_file_path: str | None = None
 
 @router.post("/generate")
 async def generate_emails(req: GenerateRequest):
@@ -62,12 +63,16 @@ async def send_emails(req: SendRequest):
     if not req.token_data:
         raise HTTPException(status_code=401, detail="Gmail not connected")
 
-    results = await send_emails_via_gmail(
-        token_data=req.token_data,
-        emails=req.emails,
-        from_name=req.from_name,
-        from_email=req.from_email,
-    )
+    try:
+        results = await send_emails_via_gmail(
+            token_data=req.token_data,
+            emails=req.emails,
+            from_name=req.from_name,
+            from_email=req.from_email,
+            resume_file_path=req.resume_file_path,
+        )
+    except (ValueError, FileNotFoundError) as e:
+        raise HTTPException(status_code=400, detail=str(e))
 
     sent = sum(1 for r in results if r.success)
     failed = sum(1 for r in results if not r.success)

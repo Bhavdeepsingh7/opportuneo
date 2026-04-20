@@ -8,6 +8,7 @@ export function AppProvider({ children }) {
     try { return JSON.parse(sessionStorage.getItem('resumeData') || 'null') } catch { return null }
   })
   const [resumeRaw, setResumeRaw] = useState(() => sessionStorage.getItem('resumeRaw') || '')
+  const [resumeFilePath, setResumeFilePath] = useState(() => sessionStorage.getItem('resumeFilePath') || '')
   const [contacts, setContacts] = useState(() => {
     try { return JSON.parse(sessionStorage.getItem('contacts') || 'null') } catch { return null }
   })
@@ -32,6 +33,10 @@ export function AppProvider({ children }) {
     if (resumeRaw) sessionStorage.setItem('resumeRaw', resumeRaw)
   }, [resumeRaw])
   useEffect(() => {
+    if (resumeFilePath) sessionStorage.setItem('resumeFilePath', resumeFilePath)
+    else sessionStorage.removeItem('resumeFilePath')
+  }, [resumeFilePath])
+  useEffect(() => {
     if (contacts) sessionStorage.setItem('contacts', JSON.stringify(contacts))
     else sessionStorage.removeItem('contacts')
   }, [contacts])
@@ -50,16 +55,18 @@ export function AppProvider({ children }) {
   }, [gmailEmail])
 
   const resetWizard = () => {
-    setResumeData(null); setResumeRaw(''); setContacts(null)
+    setResumeData(null); setResumeRaw(''); setResumeFilePath(''); setContacts(null)
     setGeneratedEmails(null); setJobContext(''); setTone('confident')
     sessionStorage.removeItem('resumeData'); sessionStorage.removeItem('contacts')
     sessionStorage.removeItem('generatedEmails'); sessionStorage.removeItem('resumeRaw')
+    sessionStorage.removeItem('resumeFilePath')
   }
 
   return (
     <AppContext.Provider value={{
       resumeData, setResumeData,
       resumeRaw, setResumeRaw,
+      resumeFilePath, setResumeFilePath,
       contacts, setContacts,
       generatedEmails, setGeneratedEmails,
       jobContext, setJobContext,

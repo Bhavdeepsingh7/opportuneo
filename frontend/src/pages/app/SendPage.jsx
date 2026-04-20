@@ -7,7 +7,7 @@ import toast from 'react-hot-toast'
 import './pages.css'
 
 export default function SendPage() {
-  const { generatedEmails, gmailTokens, gmailEmail, setGmailTokens, setGmailEmail, resetWizard } = useAppState()
+  const { generatedEmails, gmailTokens, gmailEmail, resumeFilePath, setGmailTokens, setGmailEmail, resetWizard } = useAppState()
   const navigate = useNavigate()
 
   const [sending, setSending] = useState(false)
@@ -78,6 +78,7 @@ export default function SendPage() {
         from_name: fromName || gmailEmail.split('@')[0],
         from_email: gmailEmail,
         emails,
+        resume_file_path: resumeFilePath || null,
       })
       setResults(res.data.results)
       const { sent, failed } = res.data.summary

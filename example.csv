@@ -1,6 +1,11 @@
-name,email,company,title
-hr1,hr1@gmail.com,c1,t1
-hr2,hr2@gmail.com,c2,t2
-hr3,hr3@gmail.com,c3,t3
-hr4,hr4@gmail.com,c4,t4
-hr5,hr5@gmail.com,c5,t5
+,SNo,Name,Email,Title,Company
+,1,Akanksha Puri,akanksha.puri@sourcefuse.com,Associate Director HR,SourceFuse Technologies
+,2,Akanksha Sogani,akanksha.sogani@perennialsys.com,Head HR,Perennial Systems
+,3,Akhil Jogiparthi,akhil@ibhubs.co,Vice President - Talent Accelerator,iB Hubs
+,4,Akhila Chandan,akhila@estuate.com,Associate Vice President Human Resources,"Estuate,"
+,5,Akram Mohammad,akram.mohammad@colruytgroup.com,Deputy Head Head HR,Colruyt India
+,6,Akriti,akriti@elsner.in,HR-Head,Elsner Technologies
+,7,Akshata Bhandare,akshata.bhandare@windmill.ch,"HR & Location Head, India",Windmill
+,8,Albino Mascarenhas,albino@pixis.ai,Head - Human Resources Global,Pyxis One
+,9,Allwyn Richard,allwyn.r@qbrainx.com,Head of Human Resources,QBrainX Inc
+,10,Alok Baghel,alok.singh@recro.io,Head Of Talent Management,Recro

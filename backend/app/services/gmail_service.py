@@ -1,8 +1,11 @@
 import os
 import base64
 import json
+import mimetypes
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
+from email.mime.base import MIMEBase
+from email import encoders
 from typing import List, Optional
 from google.oauth2.credentials import Credentials
 from google.auth.transport.requests import Request
@@ -82,13 +85,59 @@ def get_gmail_user_email(token_data: dict) -> str:
     user_info = service.userinfo().get().execute()
     return user_info.get("email", "")
 
-def _build_message(from_header: str, to_email: str, subject: str, body: str) -> dict:
+def _get_allowed_attachment_path(file_path: Optional[str]) -> Optional[str]:
+    if not file_path:
+        return None
+
+    backend_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
+    temp_root = os.path.abspath(os.path.join(backend_root, "temp"))
+    candidate = os.path.abspath(file_path)
+
+    if os.path.commonpath([candidate, temp_root]) != temp_root:
+        raise ValueError("Attachment must be inside the backend temp directory")
+    if not os.path.isfile(candidate):
+        raise FileNotFoundError("Resume attachment file was not found")
+
+    return candidate
+
+def _attach_file(msg: MIMEMultipart, file_path: str) -> None:
+    mime_type, _ = mimetypes.guess_type(file_path)
+    main_type, sub_type = (mime_type or "application/octet-stream").split("/", 1)
+
+    with open(file_path, "rb") as f:
+        part = MIMEBase(main_type, sub_type)
+        part.set_payload(f.read())
+
+    encoders.encode_base64(part)
+    part.add_header(
+        "Content-Disposition",
+        f'attachment; filename="{os.path.basename(file_path)}"',
+    )
+    msg.attach(part)
+
+def _build_message(
+    from_header: str,
+    to_email: str,
+    subject: str,
+    body: str,
+    attachment_path: Optional[str] = None,
+) -> dict:
     msg = MIMEMultipart("alternative")
     msg["From"] = from_header
     msg["To"] = to_email
     msg["Subject"] = subject
     msg.attach(MIMEText(body, "plain"))
     msg.attach(MIMEText(plain_to_html(body), "html"))
+
+    if attachment_path:
+        mixed = MIMEMultipart("mixed")
+        mixed["From"] = from_header
+        mixed["To"] = to_email
+        mixed["Subject"] = subject
+        mixed.attach(msg)
+        _attach_file(mixed, attachment_path)
+        msg = mixed
+
     raw = base64.urlsafe_b64encode(msg.as_bytes()).decode()
     return {"raw": raw}
 
@@ -97,19 +146,21 @@ async def send_emails_via_gmail(
     emails: List[dict],
     from_name: str,
     from_email: str,
+    resume_file_path: Optional[str] = None,
 ) -> List[EmailSendResult]:
     """Send emails using the user's Gmail via OAuth tokens."""
     creds = _build_creds(token_data)
     service = build("gmail", "v1", credentials=creds)
     results = []
     from_header = f"{from_name} <{from_email}>"
+    attachment_path = _get_allowed_attachment_path(resume_file_path)
 
     for email_data in emails:
         to = email_data.get("to", "")
         subject = email_data.get("subject", "")
         body = email_data.get("body", "")
         try:
-            message = _build_message(from_header, to, subject, body)
+            message = _build_message(from_header, to, subject, body, attachment_path)
             sent = service.users().messages().send(userId="me", body=message).execute()
             results.append(EmailSendResult(email=to, success=True, message_id=sent.get("id", "")))
         except Exception as e:

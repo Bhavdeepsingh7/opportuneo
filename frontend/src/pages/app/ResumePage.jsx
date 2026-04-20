@@ -9,7 +9,7 @@ import toast from 'react-hot-toast'
 import './pages.css'
 
 export default function ResumePage() {
-  const { setResumeData, setResumeRaw, resumeData } = useAppState()
+  const { setResumeData, setResumeRaw, setResumeFilePath, resumeData } = useAppState()
   const navigate = useNavigate()
   const [file, setFile] = useState(null)
   const [pasteText, setPasteText] = useState('')
@@ -43,6 +43,7 @@ export default function ResumePage() {
       setParsed(data.parsed)
       setResumeData(data.parsed)
       setResumeRaw(data.raw_text)
+      setResumeFilePath(data.file_path || '')
       toast.success('Resume parsed successfully!')
     } catch (err) {
       setError(err.response?.data?.detail || err.message)
