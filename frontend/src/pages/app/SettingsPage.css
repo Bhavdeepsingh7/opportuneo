@@ -1,0 +1,12 @@
+.settings-page{padding:36px 0 80px}
+.settings-card{margin-bottom:20px;display:flex;flex-direction:column;gap:14px}
+.settings-section-title{font-size:15px;font-weight:700;margin-bottom:2px}
+.settings-desc{font-size:13px;color:var(--text2);line-height:1.6}
+.settings-row{display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.settings-row-info{display:flex;align-items:center;gap:12px}
+.user-avatar-lg{width:44px;height:44px;border-radius:50%;background:var(--glow);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:18px;font-weight:800;color:var(--accent3);flex-shrink:0}
+.gmail-status{}
+.gmail-status-row{display:flex;align-items:center;gap:12px}
+.setup-steps{display:flex;flex-direction:column;gap:16px}
+.setup-step{display:flex;align-items:flex-start;gap:14px}
+.setup-step-n{width:26px;height:26px;border-radius:50%;background:var(--glow);border:1px solid var(--accent);display:flex;align-items:center;justify-content:center;font-family:var(--font-head);font-size:12px;font-weight:700;color:var(--accent3);flex-shrink:0;margin-top:2px}

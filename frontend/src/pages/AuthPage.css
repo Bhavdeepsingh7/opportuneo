@@ -1,0 +1,25 @@
+.auth-page{min-height:100vh;display:flex;align-items:center;justify-content:center;padding:24px;position:relative;overflow:hidden}
+.auth-bg{position:fixed;inset:0;pointer-events:none;z-index:0}
+.auth-orb{position:absolute;border-radius:50%;filter:blur(100px)}
+.auth-orb1{width:600px;height:600px;background:radial-gradient(circle,rgba(109,95,255,0.12) 0%,transparent 70%);top:-200px;left:50%;transform:translateX(-60%)}
+.auth-orb2{width:400px;height:400px;background:radial-gradient(circle,rgba(34,211,160,0.06) 0%,transparent 70%);bottom:-100px;right:10%}
+.auth-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 100%)}
+.auth-card{position:relative;z-index:1;width:100%;max-width:420px;padding:40px;display:flex;flex-direction:column;gap:20px}
+.auth-logo{display:flex;align-items:center;gap:9px;margin-bottom:4px}
+.auth-logo-icon{font-size:22px;filter:drop-shadow(0 0 10px rgba(109,95,255,0.7))}
+.auth-logo-text{font-family:var(--font-head);font-size:20px;font-weight:900;letter-spacing:-0.03em;background:linear-gradient(135deg,#fff 0%,var(--accent3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.auth-title{font-size:26px;font-weight:800}
+.auth-subtitle{font-size:14px;color:var(--text2);line-height:1.6;margin-top:-8px}
+.btn-google{display:flex;align-items:center;justify-content:center;gap:10px;width:100%;padding:12px;background:var(--bg3);border:1px solid var(--border2);border-radius:var(--r);font-size:14px;font-weight:600;color:var(--text);transition:all 0.2s}
+.btn-google:hover:not(:disabled){background:var(--bg4);border-color:var(--border3);transform:translateY(-1px)}
+.auth-or{display:flex;align-items:center;gap:12px;color:var(--text3);font-size:12px}
+.auth-or::before,.auth-or::after{content:'';flex:1;height:1px;background:var(--border)}
+.auth-form{display:flex;flex-direction:column;gap:16px}
+.input-icon-wrap{position:relative}
+.input-icon{position:absolute;left:12px;top:50%;transform:translateY(-50%);color:var(--text3);pointer-events:none}
+.input-icon-right{position:absolute;right:10px;top:50%;transform:translateY(-50%);background:none;color:var(--text3);padding:4px;border-radius:4px}
+.input-icon-right:hover{color:var(--text2)}
+.auth-switch{text-align:center;font-size:13px;color:var(--text3)}
+.auth-switch button{color:var(--accent3);background:none;font-size:13px;font-weight:600}
+.auth-switch button:hover{text-decoration:underline}
+@media(max-width:480px){.auth-card{padding:28px 20px}}
