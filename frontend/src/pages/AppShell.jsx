@@ -1,9 +1,10 @@
 import { useEffect } from 'react'
 import { Outlet, useNavigate, useLocation, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useAppState } from '../context/AppContext'
 import {
   LayoutDashboard, Upload, Users, Wand2,
-  Mail, Send, Settings, LogOut, Zap
+  Mail, Send, Settings, LogOut, Zap, Check
 } from 'lucide-react'
 import './AppShell.css'
 
@@ -20,6 +21,7 @@ const NAV = [
 
 export default function AppShell() {
   const { user, loading, signOut } = useAuth()
+  const { resumeData, contacts, generatedEmails } = useAppState()
   const navigate = useNavigate()
   const location = useLocation()
 
@@ -39,6 +41,10 @@ export default function AppShell() {
   // Parse wizard step for progress
   const steps = ['resume', 'contacts', 'configure', 'review', 'send']
   const currentStep = steps.findIndex(s => location.pathname.includes(s))
+  const hasResume = !!(resumeData && Object.keys(resumeData).length)
+  const hasContacts = Array.isArray(contacts) && contacts.length > 0
+  const hasGeneratedEmails = Array.isArray(generatedEmails) && generatedEmails.length > 0
+  const completedSteps = [hasResume, hasContacts, hasGeneratedEmails, false, false]
 
   return (
     <div className="app-shell">
@@ -96,17 +102,20 @@ export default function AppShell() {
           <div className="wizard-bar">
             <div className="container">
               <div className="steps-nav">
-                {['Resume', 'Contacts', 'Configure', 'Review', 'Send'].map((label, i) => (
-                  <div key={label} style={{ display: 'flex', alignItems: 'center' }}>
-                    {i > 0 && <div className="step-line" />}
-                    <div className={`step-item ${i === currentStep ? 'active' : i < currentStep ? 'done' : ''}`}>
-                      <div className="step-dot">
-                        {i < currentStep ? '✓' : i + 1}
+                {['Resume', 'Contacts', 'Configure', 'Review', 'Send'].map((label, i) => {
+                  const isDone = completedSteps[i]
+                  return (
+                    <div key={label} style={{ display: 'flex', alignItems: 'center' }}>
+                      {i > 0 && <div className="step-line" />}
+                      <div className={`step-item ${i === currentStep ? 'active' : isDone ? 'done' : ''}`}>
+                        <div className="step-dot">
+                          {isDone ? <Check size={12} /> : i + 1}
+                        </div>
+                        <span className="step-label-text">{label}</span>
                       </div>
-                      <span className="step-label-text">{label}</span>
                     </div>
-                  </div>
-                ))}
+                  )
+                })}
               </div>
             </div>
           </div>

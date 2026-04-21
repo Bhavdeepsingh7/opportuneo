@@ -24,7 +24,7 @@ export default function ReviewPage() {
           <AlertCircle size={40} color="var(--text3)" style={{margin:'0 auto 16px'}}/>
           <h3>No emails generated yet</h3>
           <p style={{color:'var(--text3)',marginBottom:24}}>Go back and generate emails first.</p>
-          <button className="btn btn-primary" onClick={() => navigate('/app/step/configure')}>Go to Configure</button>
+          <button className="btn btn-primary" onClick={() => navigate('/app/configure')}>Go to Configure</button>
         </div>
       </div>
     )
@@ -151,8 +151,8 @@ export default function ReviewPage() {
         </div>
 
         <div className="step-actions">
-          <button className="btn btn-ghost btn-lg" onClick={() => navigate('/app/step/configure')}><ArrowLeft size={16}/> Back</button>
-          <button className="btn btn-primary btn-lg" onClick={() => navigate('/app/step/send')}>
+          <button className="btn btn-ghost btn-lg" onClick={() => navigate('/app/configure')}><ArrowLeft size={16}/> Back</button>
+          <button className="btn btn-primary btn-lg" onClick={() => navigate('/app/send')}>
             Send All <ArrowRight size={16}/>
           </button>
         </div>

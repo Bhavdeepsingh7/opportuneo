@@ -122,7 +122,7 @@ export default function ResumePage() {
             {loading ? <><span className="spinner"/> Parsing…</> : <>{parsed ? 'Re-parse' : 'Parse Resume'} <ArrowRight size={16}/></>}
           </button>
           {parsed && (
-            <button className="btn btn-secondary btn-lg" onClick={() => navigate('/app/step/contacts')}>
+            <button className="btn btn-secondary btn-lg" onClick={() => navigate('/app/contacts')}>
               Next: Contacts <ArrowRight size={16}/>
             </button>
           )}
