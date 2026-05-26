@@ -1,0 +1,232 @@
+.oa-wizard {
+  width: 100%;
+  min-height: 100vh;
+  padding: 32px 0;
+  overflow-x: hidden;
+  background:
+    radial-gradient(circle at top left, rgba(109, 95, 255, 0.12), transparent 34rem),
+    radial-gradient(circle at bottom right, rgba(34, 211, 160, 0.07), transparent 30rem);
+}
+
+.oa-wizard-shell {
+  width: min(100%, 1040px);
+  margin-inline: auto;
+  padding-inline: 24px;
+  animation: wizardIn 220ms ease-out;
+}
+
+.oa-wizard-header > div:first-child {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  align-items: end;
+  gap: 20px;
+}
+
+.oa-wizard-header h1 {
+  margin: 0;
+  font-size: clamp(24px, 3vw, 34px);
+  line-height: 1.1;
+  letter-spacing: 0;
+}
+
+.oa-wizard-header p {
+  max-width: 58ch;
+  margin-top: 6px;
+  line-height: 1.55;
+}
+
+.oa-progress {
+  min-width: 176px;
+}
+
+.oa-progress > div:last-child {
+  width: 100%;
+}
+
+.oa-stepper {
+  border-radius: 18px;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.03);
+}
+
+.oa-stepper > div:first-child {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: stretch;
+  gap: 8px;
+  overflow-x: visible;
+}
+
+.oa-stepper-wrap {
+  min-width: 0;
+}
+
+.oa-stepper-item {
+  min-height: 44px;
+  max-width: 100%;
+  border-radius: 14px;
+  transition: background 180ms ease, color 180ms ease, box-shadow 180ms ease;
+}
+
+.oa-stepper-dot {
+  flex: 0 0 28px;
+  transition: transform 180ms ease, background 180ms ease, color 180ms ease;
+}
+
+.oa-stepper-label {
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.oa-stepper-connector {
+  align-self: center;
+  flex: 0 0 26px;
+}
+
+.oa-stepper-item:hover .oa-stepper-dot {
+  transform: translateY(-1px);
+}
+
+.oa-step-stage {
+  position: relative;
+  overflow: hidden;
+  border-radius: 18px;
+  padding: clamp(18px, 3vw, 30px);
+  backdrop-filter: blur(14px);
+}
+
+.oa-step-stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  border-radius: inherit;
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.04);
+}
+
+.oa-step {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+  line-height: 1.55;
+}
+
+.oa-step h2 {
+  margin: 0;
+  font-size: clamp(20px, 2.2vw, 26px);
+  line-height: 1.18;
+  letter-spacing: 0;
+}
+
+.oa-step p {
+  line-height: 1.6;
+}
+
+.oa-step button,
+.oa-wizard-nav button {
+  min-height: 42px;
+  white-space: normal;
+  line-height: 1.2;
+}
+
+.oa-step input,
+.oa-step textarea {
+  max-width: 100%;
+}
+
+.oa-step textarea {
+  min-height: 150px;
+}
+
+.oa-step .dropzone {
+  width: 100%;
+  min-height: 170px;
+  display: grid;
+  place-items: center;
+  padding: clamp(24px, 5vw, 42px);
+  border-width: 1.5px;
+  border-radius: 18px;
+}
+
+.oa-step .dropzone * {
+  max-width: 100%;
+}
+
+.oa-contact-row {
+  padding-inline: 10px;
+  border-radius: 10px;
+}
+
+.oa-results {
+  max-width: 100%;
+}
+
+.oa-wizard-nav {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 640px) {
+  .oa-wizard {
+    padding-block: 20px;
+  }
+
+  .oa-wizard-shell {
+    padding-inline: 14px;
+  }
+
+  .oa-wizard-header > div:first-child {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 14px;
+  }
+
+  .oa-progress {
+    width: 100%;
+    align-items: stretch;
+  }
+
+  .oa-progress > div:first-child {
+    text-align: left;
+  }
+
+  .oa-stepper {
+    padding: 12px;
+  }
+
+  .oa-stepper > div:first-child {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .oa-stepper-wrap {
+    width: 100%;
+  }
+
+  .oa-stepper-item {
+    width: 100%;
+  }
+
+  .oa-stepper-connector {
+    display: none;
+  }
+
+  .oa-step-stage {
+    padding: 16px;
+  }
+
+  .oa-step {
+    gap: 18px;
+  }
+
+  .oa-step .dropzone {
+    min-height: 150px;
+    padding: 22px 16px;
+  }
+
+  .oa-wizard-nav {
+    align-items: stretch;
+  }
+
+  .oa-wizard-nav button {
+    flex: 1 1 140px;
+  }
+}

@@ -1,11 +1,12 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
-import { Zap, LayoutDashboard, Settings, LogOut, Menu, X, ChevronRight } from 'lucide-react'
+import { Zap, LayoutDashboard, Settings, LogOut, Menu, X, ChevronRight, DollarSign } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import './AppShell.css'
 
 const NAV = [
   { path: '/app/dashboard', label: 'Dashboard', icon: LayoutDashboard },
+  { path: '/app/subscription', label: 'Subscription', icon: DollarSign },
   { path: '/app/settings',  label: 'Settings',  icon: Settings },
 ]
 
@@ -32,13 +33,13 @@ export default function AppShell({ children }) {
         </div>
 
         <nav className="sidebar-nav">
-          {NAV.map(({ path, label, icon: Icon }) => (
+          {NAV.map(({ path, label, icon: NavIcon }) => (
             <button
               key={path}
               className={`nav-item ${isActive(path) ? 'active' : ''}`}
               onClick={() => { navigate(path); setMobileOpen(false) }}
             >
-              <Icon size={16} />
+              {NavIcon({ size: 16 })}
               {label}
             </button>
           ))}

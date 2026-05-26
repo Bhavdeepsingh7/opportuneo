@@ -1,29 +1,21 @@
 import { useEffect } from 'react'
-import { Outlet, useNavigate, useLocation, NavLink } from 'react-router-dom'
+import { Outlet, useNavigate, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
-import { useAppState } from '../context/AppContext'
 import {
-  LayoutDashboard, Upload, Users, Wand2,
-  Mail, Send, Settings, LogOut, Zap, Check
+  LayoutDashboard, Settings, LogOut, DollarSign
 } from 'lucide-react'
 import './AppShell.css'
 
 const NAV = [
   { to: '/app/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
-  { to: '/app/resume', icon: Upload, label: 'Resume' },
-  { to: '/app/contacts', icon: Users, label: 'Contacts' },
-  { to: '/app/configure', icon: Wand2, label: 'Configure' },
-  { to: '/app/review', icon: Mail, label: 'Review' },
-  { to: '/app/send', icon: Send, label: 'Send' },
+  { to: '/app/subscription', icon: DollarSign, label: 'Subscription' },
   { divider: true },
   { to: '/app/settings', icon: Settings, label: 'Settings' },
 ]
 
 export default function AppShell() {
   const { user, loading, signOut } = useAuth()
-  const { resumeData, contacts, generatedEmails } = useAppState()
   const navigate = useNavigate()
-  const location = useLocation()
 
   useEffect(() => {
     if (!loading && !user) navigate('/auth')
@@ -37,14 +29,6 @@ export default function AppShell() {
     )
   }
   if (!user) return null
-
-  // Parse wizard step for progress
-  const steps = ['resume', 'contacts', 'configure', 'review', 'send']
-  const currentStep = steps.findIndex(s => location.pathname.includes(s))
-  const hasResume = !!(resumeData && Object.keys(resumeData).length)
-  const hasContacts = Array.isArray(contacts) && contacts.length > 0
-  const hasGeneratedEmails = Array.isArray(generatedEmails) && generatedEmails.length > 0
-  const completedSteps = [hasResume, hasContacts, hasGeneratedEmails, false, false]
 
   return (
     <div className="app-shell">
@@ -97,29 +81,6 @@ export default function AppShell() {
 
       {/* Main */}
       <main className="shell-main">
-        {/* Wizard steps bar shown on wizard pages */}
-        {currentStep >= 0 && (
-          <div className="wizard-bar">
-            <div className="container">
-              <div className="steps-nav">
-                {['Resume', 'Contacts', 'Configure', 'Review', 'Send'].map((label, i) => {
-                  const isDone = completedSteps[i]
-                  return (
-                    <div key={label} style={{ display: 'flex', alignItems: 'center' }}>
-                      {i > 0 && <div className="step-line" />}
-                      <div className={`step-item ${i === currentStep ? 'active' : isDone ? 'done' : ''}`}>
-                        <div className="step-dot">
-                          {isDone ? <Check size={12} /> : i + 1}
-                        </div>
-                        <span className="step-label-text">{label}</span>
-                      </div>
-                    </div>
-                  )
-                })}
-              </div>
-            </div>
-          </div>
-        )}
         <Outlet />
       </main>
     </div>

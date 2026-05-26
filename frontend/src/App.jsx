@@ -5,12 +5,8 @@ import { AppProvider } from './context/AppContext'
 import AuthPage from './pages/AuthPage'
 import AppShell from './pages/AppShell'
 import Dashboard from './pages/app/Dashboard'
-import ResumePage from './pages/app/ResumePage'
-import ContactsPage from './pages/app/ContactsPage'
-import ConfigurePage from './pages/app/ConfigurePage'
-import ReviewPage from './pages/app/ReviewPage'
-import SendPage from './pages/app/SendPage'
 import SettingsPage from './pages/app/SettingsPage'
+import SubscriptionPage from './pages/app/SubscriptionPage'
 
 export default function App() {
   return (
@@ -31,12 +27,14 @@ export default function App() {
             <Route path="/app" element={<AppShell />}>
               <Route index element={<Navigate to="/app/dashboard" replace />} />
               <Route path="dashboard"  element={<Dashboard />} />
-              <Route path="resume"     element={<ResumePage />} />
-              <Route path="contacts"   element={<ContactsPage />} />
-              <Route path="configure"  element={<ConfigurePage />} />
-              <Route path="review"     element={<ReviewPage />} />
-              <Route path="send"       element={<SendPage />} />
+              {/* Legacy URLs → wizard */}
+              <Route path="resume"     element={<Navigate to="/app/dashboard" replace />} />
+              <Route path="contacts"   element={<Navigate to="/app/dashboard" replace />} />
+              <Route path="configure"  element={<Navigate to="/app/dashboard" replace />} />
+              <Route path="review"     element={<Navigate to="/app/dashboard" replace />} />
+              <Route path="send"       element={<Navigate to="/app/dashboard" replace />} />
               <Route path="settings"   element={<SettingsPage />} />
+              <Route path="subscription"   element={<SubscriptionPage />} />
             </Route>
             <Route path="*" element={<Navigate to="/auth" replace />} />
           </Routes>

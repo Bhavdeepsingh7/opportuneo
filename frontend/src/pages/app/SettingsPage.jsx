@@ -1,3 +1,4 @@
+/* eslint-disable react-hooks/set-state-in-effect */
 import { useState, useEffect } from 'react'
 import { useAppState } from '../../context/AppContext'
 import { getGmailAuthUrl, getGmailTokens, verifyGmailToken } from '../../lib/api'

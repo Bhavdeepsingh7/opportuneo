@@ -1,0 +1,16 @@
+.oa-step5 .oa-results {
+  overflow: hidden;
+}
+
+.oa-step5 .oa-results [class*="space-y-2"] {
+  max-height: 360px;
+  overflow: auto;
+  padding-right: 4px;
+}
+
+@media (max-width: 640px) {
+  .oa-step5 .oa-results [class*="justify-between"] {
+    align-items: flex-start;
+  }
+}
+

@@ -1,0 +1,18 @@
+.oa-step2 .oa-contact-row {
+  transition: background 160ms ease, border-color 160ms ease, padding 160ms ease;
+}
+
+.oa-step2 .oa-contact-row:hover {
+  background: var(--bg2);
+}
+
+.oa-step2 .dropzone {
+  cursor: pointer;
+}
+
+@media (max-width: 640px) {
+  .oa-step2 .oa-contact-row {
+    align-items: flex-start;
+  }
+}
+
