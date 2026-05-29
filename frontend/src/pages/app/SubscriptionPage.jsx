@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+import { motion as Motion, AnimatePresence } from 'framer-motion'
 import {
   ArrowRight,
   Check,
@@ -103,7 +103,7 @@ function BillingToggle({ billing, setBilling }) {
             ].join(' ')}
           >
             {active && (
-              <motion.span
+              <Motion.span
                 layoutId="billing-pill"
                 className="absolute inset-0 rounded-full bg-[var(--accent)]"
                 transition={{ type: 'spring', stiffness: 420, damping: 34 }}
@@ -125,7 +125,7 @@ function PlanCard({ plan, billing, index }) {
   }, [billing, plan])
 
   return (
-    <motion.article
+    <Motion.article
       variants={fadeUp}
       whileHover={{ y: -8, scale: 1.01 }}
       transition={{ type: 'spring', stiffness: 260, damping: 22 }}
@@ -179,7 +179,7 @@ function PlanCard({ plan, billing, index }) {
           ))}
         </div>
       </div>
-    </motion.article>
+    </Motion.article>
   )
 }
 
@@ -205,7 +205,7 @@ function FaqItem({ item, open, onClick }) {
       </button>
       <AnimatePresence initial={false}>
         {open && (
-          <motion.div
+          <Motion.div
             className="faq-answer px-5"
             initial={{ height: 0, opacity: 0 }}
             animate={{ height: 'auto', opacity: 1 }}
@@ -213,7 +213,7 @@ function FaqItem({ item, open, onClick }) {
             transition={{ duration: 0.24, ease: 'easeOut' }}
           >
             <p className="pb-5 text-sm leading-6 text-[var(--text2)]">{item[1]}</p>
-          </motion.div>
+          </Motion.div>
         )}
       </AnimatePresence>
     </div>
@@ -226,43 +226,43 @@ export default function SubscriptionPage() {
 
   return (
     <main className="pricing-page">
-      <motion.div
+      <Motion.div
         className="pricing-bg-glow one"
         animate={{ scale: [1, 1.08, 1], opacity: [.55, .8, .55] }}
         transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
       />
-      <motion.div
+      <Motion.div
         className="pricing-bg-glow two"
         animate={{ scale: [1.04, 1, 1.04], opacity: [.45, .7, .45] }}
         transition={{ duration: 9, repeat: Infinity, ease: 'easeInOut' }}
       />
 
       <div className="pricing-shell">
-        <motion.section
+        <Motion.section
           variants={stagger}
           initial="hidden"
           animate="show"
           className="mx-auto max-w-4xl text-center"
         >
-          <motion.div variants={fadeUp} className="pricing-eyebrow mx-auto inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-[var(--accent3)]">
+          <Motion.div variants={fadeUp} className="pricing-eyebrow mx-auto inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-[var(--accent3)]">
             <Sparkles size={14} />
             AI-native outreach infrastructure
-          </motion.div>
-          <motion.h1 variants={fadeUp} className="mt-7 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
+          </Motion.div>
+          <Motion.h1 variants={fadeUp} className="mt-7 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
             Scale Your Outreach with AI
-          </motion.h1>
-          <motion.p variants={fadeUp} className="mx-auto mt-6 max-w-2xl text-base leading-8 text-[var(--text2)] sm:text-lg">
+          </Motion.h1>
+          <Motion.p variants={fadeUp} className="mx-auto mt-6 max-w-2xl text-base leading-8 text-[var(--text2)] sm:text-lg">
             Automate lead generation, personalize every message, and launch high-converting outbound campaigns from one intelligent workspace.
-          </motion.p>
-          <motion.div variants={fadeUp} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
+          </Motion.p>
+          <Motion.div variants={fadeUp} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <BillingToggle billing={billing} setBilling={setBilling} />
             <span className="save-badge rounded-full px-4 py-2 text-xs font-semibold text-[var(--green)]">
               Save 20% yearly
             </span>
-          </motion.div>
-        </motion.section>
+          </Motion.div>
+        </Motion.section>
 
-        <motion.section
+        <Motion.section
           variants={stagger}
           initial="hidden"
           whileInView="show"
@@ -272,9 +272,9 @@ export default function SubscriptionPage() {
           {plans.map((plan, index) => (
             <PlanCard key={plan.name} plan={plan} billing={billing} index={index} />
           ))}
-        </motion.section>
+        </Motion.section>
 
-        <motion.section variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} className="mt-20">
+        <Motion.section variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} className="mt-20">
           <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
             <div>
               <h2 className="text-2xl font-semibold text-white sm:text-3xl">Compare plans</h2>
@@ -307,21 +307,21 @@ export default function SubscriptionPage() {
               </tbody>
             </table>
           </div>
-        </motion.section>
+        </Motion.section>
 
-        <motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-20">
-          <motion.div variants={fadeUp} className="text-center">
+        <Motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-20">
+          <Motion.div variants={fadeUp} className="text-center">
             <h2 className="text-2xl font-semibold text-white sm:text-3xl">Trusted by 10,000+ teams</h2>
             <p className="mt-3 text-sm text-[var(--text2)]">From early-stage founders to revenue teams running global campaigns.</p>
-          </motion.div>
-          <motion.div variants={fadeUp} className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
+          </Motion.div>
+          <Motion.div variants={fadeUp} className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
             {logos.map((logo) => (
               <div key={logo} className="logo-pill rounded-2xl px-4 py-5 text-center text-sm font-semibold tracking-[0.18em] text-[var(--text3)]">
                 {logo}
               </div>
             ))}
-          </motion.div>
-          <motion.div variants={fadeUp} className="mt-5 grid gap-4 md:grid-cols-3">
+          </Motion.div>
+          <Motion.div variants={fadeUp} className="mt-5 grid gap-4 md:grid-cols-3">
             {[
               ['48M+', 'personalized messages generated'],
               ['6.4x', 'average campaign lift'],
@@ -332,10 +332,10 @@ export default function SubscriptionPage() {
                 <div className="mt-2 text-sm text-[var(--text2)]">{label}</div>
               </div>
             ))}
-          </motion.div>
-        </motion.section>
+          </Motion.div>
+        </Motion.section>
 
-        <motion.section variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mx-auto mt-20 max-w-3xl">
+        <Motion.section variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mx-auto mt-20 max-w-3xl">
           <div className="mb-6 text-center">
             <h2 className="text-2xl font-semibold text-white sm:text-3xl">Questions, answered</h2>
           </div>
@@ -349,16 +349,16 @@ export default function SubscriptionPage() {
               />
             ))}
           </div>
-        </motion.section>
+        </Motion.section>
 
-        <motion.section
+        <Motion.section
           variants={fadeUp}
           initial="hidden"
           whileInView="show"
           viewport={{ once: true, amount: 0.2 }}
           className="final-cta relative mt-20 overflow-hidden rounded-[28px] px-6 py-12 text-center sm:px-12 sm:py-16"
         >
-          <motion.div
+          <Motion.div
             className="absolute inset-0 opacity-60"
             animate={{ backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'] }}
             transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
@@ -376,7 +376,7 @@ export default function SubscriptionPage() {
               <ArrowRight size={17} />
             </button>
           </div>
-        </motion.section>
+        </Motion.section>
       </div>
     </main>
   )

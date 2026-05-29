@@ -88,6 +88,7 @@
 .pricing-card {
   position: relative;
   overflow: hidden;
+  padding: 5px;
 }
 
 .pricing-card::before {

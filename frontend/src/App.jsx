@@ -7,6 +7,7 @@ import AppShell from './pages/AppShell'
 import Dashboard from './pages/app/Dashboard'
 import SettingsPage from './pages/app/SettingsPage'
 import SubscriptionPage from './pages/app/SubscriptionPage'
+import LegalPage from './pages/legal/LegalPage'
 
 export default function App() {
   return (
@@ -24,6 +25,9 @@ export default function App() {
           <Routes>
             <Route path="/" element={<Navigate to="/auth" replace />} />
             <Route path="/auth" element={<AuthPage />} />
+            <Route path="/privacy-policy" element={<LegalPage type="privacy" />} />
+            <Route path="/terms-and-conditions" element={<LegalPage type="terms" />} />
+            <Route path="/refund-and-cancellation-policy" element={<LegalPage type="refund" />} />
             <Route path="/app" element={<AppShell />}>
               <Route index element={<Navigate to="/app/dashboard" replace />} />
               <Route path="dashboard"  element={<Dashboard />} />

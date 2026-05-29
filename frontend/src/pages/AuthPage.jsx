@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, Zap, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import Footer from '../components/Footer'
 import './AuthPage.css'
 
 export default function AuthPage() {
@@ -137,6 +138,7 @@ export default function AuthPage() {
           </button>
         </p>
       </div>
+      <Footer />
     </div>
   )
 }

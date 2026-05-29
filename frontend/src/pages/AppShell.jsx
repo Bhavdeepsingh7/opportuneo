@@ -4,6 +4,7 @@ import { useAuth } from '../context/AuthContext'
 import {
   LayoutDashboard, Settings, LogOut, DollarSign
 } from 'lucide-react'
+import Footer from '../components/Footer'
 import './AppShell.css'
 
 const NAV = [
@@ -81,7 +82,10 @@ export default function AppShell() {
 
       {/* Main */}
       <main className="shell-main">
-        <Outlet />
+        <div className="shell-content">
+          <Outlet />
+        </div>
+        <Footer />
       </main>
     </div>
   )

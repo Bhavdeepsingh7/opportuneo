@@ -151,6 +151,11 @@
   flex-direction: column;
 }
 
+.shell-content {
+  flex: 1;
+  min-width: 0;
+}
+
 /* Wizard bar */
 .wizard-bar {
   background: var(--bg2);

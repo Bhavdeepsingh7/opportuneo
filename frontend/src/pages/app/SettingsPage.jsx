@@ -40,7 +40,7 @@ export default function SettingsPage() {
           window.history.replaceState({}, '', window.location.pathname)
         })
     }
-  }, [])
+  }, [setGmailEmail, setGmailTokens])
 
   const connectGmail = async () => {
     try {
