@@ -21,10 +21,19 @@
   min-height: auto;
 }
 
+.oa-stepper-item{
+  padding: 10px;
+}
+
 @media (max-width: 640px) {
   .oa-step1 .dropzone [class*="max-w-md"] {
     flex-direction: column;
     text-align: center;
   }
+
+
 }
 
+  button{
+    padding:10px;
+  }

@@ -119,7 +119,7 @@ export default function Step5Send({ data, setData, prevStep }) {
         </div>
       )}
 
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-5">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-5 flex-step-5">
         <div className="text-sm font-semibold text-[var(--text)]">Gmail account</div>
         <div className="mt-1 text-xs text-[var(--text3)]">
           Emails are sent from your Gmail via OAuth. Your password is never shared.

@@ -1,3 +1,12 @@
+.flex{
+  margin: 2px;
+}
+
+.pricing-card button{
+  height: 50px;
+  border-radius: 500px;
+}
+
 .pricing-page {
   position: relative;
   min-height: 100vh;
