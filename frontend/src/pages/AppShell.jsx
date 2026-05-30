@@ -1,8 +1,9 @@
 import { useEffect } from 'react'
 import { Outlet, useNavigate, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
+import { useAppState } from '../context/AppContext'
 import {
-  LayoutDashboard, Settings, LogOut, DollarSign
+  LayoutDashboard, Settings, LogOut, DollarSign, Coins
 } from 'lucide-react'
 import Footer from '../components/Footer'
 import './AppShell.css'
@@ -16,7 +17,9 @@ const NAV = [
 
 export default function AppShell() {
   const { user, loading, signOut } = useAuth()
+  const { availableCredits, subscriptionName } = useAppState()
   const navigate = useNavigate()
+  const formattedCredits = new Intl.NumberFormat('en-IN').format(availableCredits || 0)
 
   useEffect(() => {
     if (!loading && !user) navigate('/auth')
@@ -37,8 +40,8 @@ export default function AppShell() {
       <aside className="sidebar">
         <div className="sidebar-top">
           <button className="sidebar-logo" onClick={() => navigate('/app/dashboard')}>
-            <span className="logo-glow">⚡</span>
-            <span className="logo-label">OutreachAI</span>
+            <span className="logo-glow">op</span>
+            <span className="logo-label">opportuneo</span>
           </button>
 
           <nav className="sidebar-nav">
@@ -59,29 +62,43 @@ export default function AppShell() {
           </nav>
         </div>
 
-        <div className="sidebar-bottom">
-          <div className="user-pill">
-            <div className="user-avatar">
-              {user.user_metadata?.avatar_url
-                ? <img src={user.user_metadata.avatar_url} alt="avatar" />
-                : <span>{(user.email || 'U')[0].toUpperCase()}</span>
-              }
-            </div>
-            <div className="user-info">
-              <span className="user-name">
-                {user.user_metadata?.full_name || user.email?.split('@')[0]}
-              </span>
-              <span className="user-email">{user.email}</span>
+        <div className="sidebar-bottom-wrap">
+          <div className="subscription-pill" title={`Current subscription: ${subscriptionName}`}>
+            <span>Subscription</span>
+            <strong>{subscriptionName}</strong>
+          </div>
+
+          <div className="sidebar-bottom">
+            <div className="user-pill">
+              <div className="user-avatar">
+                {user.user_metadata?.avatar_url
+                  ? <img src={user.user_metadata.avatar_url} alt="avatar" />
+                  : <span>{(user.email || 'U')[0].toUpperCase()}</span>
+                }
+              </div>
+              <button className="btn-signout" onClick={signOut} title="Sign out" aria-label="Sign out">
+                <LogOut size={15} />
+              </button>
+              <div className="user-info">
+                <span className="user-name">
+                  {user.user_metadata?.full_name || user.email?.split('@')[0]}
+                </span>
+                <span className="user-email">{user.email}</span>
+              </div>
             </div>
           </div>
-          <button className="btn-signout" onClick={signOut} title="Sign out">
-            <LogOut size={15} />
-          </button>
         </div>
       </aside>
 
       {/* Main */}
       <main className="shell-main">
+        <header className="shell-topbar" aria-label="Account credits">
+          <div className="credits-pill" title={`${formattedCredits} email credits available`}>
+            <Coins size={16} />
+            <span>{formattedCredits}</span>
+            <small>credits</small>
+          </div>
+        </header>
         <div className="shell-content">
           <Outlet />
         </div>

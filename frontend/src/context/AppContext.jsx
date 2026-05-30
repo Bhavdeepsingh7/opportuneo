@@ -18,6 +18,11 @@ export function AppProvider({ children }) {
   })
   const [jobContext, setJobContext] = useState(() => sessionStorage.getItem('jobContext') || '')
   const [tone, setTone] = useState(() => sessionStorage.getItem('tone') || 'confident')
+  const [availableCredits, setAvailableCredits] = useState(() => {
+    const stored = Number(sessionStorage.getItem('availableCredits'))
+    return Number.isFinite(stored) && stored >= 0 ? stored : 0
+  })
+  const [subscriptionName, setSubscriptionName] = useState(() => sessionStorage.getItem('subscriptionName') || 'Free')
 
   // Gmail OAuth tokens (sessionStorage - cleared on tab close)
   const [gmailTokens, setGmailTokens] = useState(() => {
@@ -47,6 +52,8 @@ export function AppProvider({ children }) {
   }, [generatedEmails])
   useEffect(() => { sessionStorage.setItem('jobContext', jobContext) }, [jobContext])
   useEffect(() => { sessionStorage.setItem('tone', tone) }, [tone])
+  useEffect(() => { sessionStorage.setItem('availableCredits', String(availableCredits)) }, [availableCredits])
+  useEffect(() => { sessionStorage.setItem('subscriptionName', subscriptionName) }, [subscriptionName])
   useEffect(() => {
     if (gmailTokens) sessionStorage.setItem('gmailTokens', JSON.stringify(gmailTokens))
     else sessionStorage.removeItem('gmailTokens')
@@ -74,6 +81,8 @@ export function AppProvider({ children }) {
       tone, setTone,
       gmailTokens, setGmailTokens,
       gmailEmail, setGmailEmail,
+      availableCredits, setAvailableCredits,
+      subscriptionName, setSubscriptionName,
       resetWizard,
     }}>
       {children}

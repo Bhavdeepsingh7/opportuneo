@@ -12,9 +12,9 @@ export default function Footer() {
   return (
     <footer className="site-footer">
       <div className="site-footer-inner">
-        <Link to="/auth" className="site-footer-brand" aria-label="[Product Name] home">
-          <span className="site-footer-mark">AI</span>
-          <span>[Product Name]</span>
+        <Link to="/" className="site-footer-brand" aria-label="opportuneo home">
+          <span className="site-footer-mark">op</span>
+          <span>opportuneo</span>
         </Link>
 
         <nav className="site-footer-links" aria-label="Legal and support links">
@@ -32,7 +32,7 @@ export default function Footer() {
         </nav>
 
         <p className="site-footer-copy">
-          &copy; [Company Name]. All rights reserved.
+          &copy; opportuneo. All rights reserved.
         </p>
       </div>
     </footer>

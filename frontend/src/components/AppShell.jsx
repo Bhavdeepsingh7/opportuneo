@@ -28,8 +28,8 @@ export default function AppShell({ children }) {
       {/* Sidebar */}
       <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-logo" onClick={() => navigate('/app/dashboard')}>
-          <span className="logo-bolt">⚡</span>
-          <span className="logo-name">OutreachAI</span>
+          <span className="logo-bolt">op</span>
+          <span className="logo-name">opportuneo</span>
         </div>
 
         <nav className="sidebar-nav">
@@ -71,7 +71,7 @@ export default function AppShell({ children }) {
           <button className="btn btn-ghost btn-icon" onClick={() => setMobileOpen(true)}>
             <Menu size={20} />
           </button>
-          <span className="logo-name" style={{ fontFamily: 'var(--font-head)', fontWeight: 900 }}>OutreachAI</span>
+          <span className="logo-name" style={{ fontFamily: 'var(--font-head)', fontWeight: 900 }}>opportuneo</span>
           <div style={{ width: 36 }} />
         </header>
 

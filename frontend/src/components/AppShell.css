@@ -24,8 +24,18 @@
 }
 
 .logo-bolt {
-  font-size: 20px;
-  filter: drop-shadow(0 0 8px rgba(109,95,255,0.7));
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 28px;
+  height: 28px;
+  border: 1px solid rgba(34,211,160,.26);
+  border-radius: 8px;
+  background: var(--green-bg);
+  color: var(--green);
+  font-family: var(--font-head);
+  font-size: 11px;
+  font-weight: 900;
 }
 
 .logo-name {

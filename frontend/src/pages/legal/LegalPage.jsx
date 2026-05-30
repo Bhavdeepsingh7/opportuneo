@@ -10,9 +10,9 @@ export default function LegalPage({ type }) {
     <div className="legal-page">
       <header className="legal-hero">
         <div className="legal-shell">
-          <Link to="/auth" className="legal-brand">
-            <span className="legal-brand-mark">AI</span>
-            <span>[Product Name]</span>
+          <Link to="/" className="legal-brand">
+            <span className="legal-brand-mark">op</span>
+            <span>opportuneo</span>
           </Link>
           <div className="legal-hero-copy">
             <span className="legal-eyebrow">{page.eyebrow}</span>

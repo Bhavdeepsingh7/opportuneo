@@ -4,13 +4,13 @@ export const legalPages = {
     title: 'Privacy Policy',
     eyebrow: 'Legal',
     description:
-      'This Privacy Policy explains how [Company Name] collects, uses, shares, and protects information when you use [Product Name].',
+      'This Privacy Policy explains how opportuneo collects, uses, shares, and protects information when you use opportuneo.',
     updated: '[Effective Date]',
     sections: [
       {
         title: '1. Information We Collect',
         body: [
-          '[Product Name] is an AI outreach SaaS platform that helps users automate outreach, generate personalized messages, manage campaigns, and track responses. To provide the Service, we may collect information you provide directly, information generated through your use of the Service, and information from connected third-party services.',
+          'opportuneo is an AI job outreach SaaS platform that helps users generate personalized emails, manage campaigns, and reach recruiters or hiring teams. To provide the Service, we may collect information you provide directly, information generated through your use of the Service, and information from connected third-party services.',
           'This may include account details, workspace information, uploaded contacts, campaign content, message drafts, response data, usage logs, device data, and support communications.',
         ],
       },
@@ -84,7 +84,7 @@ export const legalPages = {
       {
         title: '12. Contact Information',
         body: [
-          'If you have questions about this Privacy Policy or our privacy practices, contact us at [Business Email] or write to [Company Name], [Business Address]. Website: [Website URL].',
+          'If you have questions about this Privacy Policy or our privacy practices, contact us at [Business Email] or write to opportuneo, [Business Address]. Website: [Website URL].',
         ],
       },
     ],
@@ -94,13 +94,13 @@ export const legalPages = {
     title: 'Terms & Conditions',
     eyebrow: 'Legal',
     description:
-      'These Terms & Conditions govern your access to and use of [Product Name], an AI outreach SaaS platform operated by [Company Name].',
+      'These Terms & Conditions govern your access to and use of opportuneo, an AI job outreach SaaS platform operated by opportuneo.',
     updated: '[Effective Date]',
     sections: [
       {
         title: '1. Acceptance of Terms',
         body: [
-          'By accessing or using [Product Name], you agree to these Terms & Conditions and any policies referenced in them. If you use the Service on behalf of an organization, you represent that you have authority to bind that organization.',
+          'By accessing or using opportuneo, you agree to these Terms & Conditions and any policies referenced in them. If you use the Service on behalf of an organization, you represent that you have authority to bind that organization.',
           'If you do not agree to these Terms, you may not access or use the Service.',
         ],
       },
@@ -114,14 +114,14 @@ export const legalPages = {
       {
         title: '3. Subscription Plans',
         body: [
-          '[Product Name] may offer free trials, free plans, paid subscriptions, usage-based limits, add-ons, or enterprise plans. Plan features, limits, and pricing may vary and will be presented at checkout or in your account.',
+          'opportuneo may offer free trials, free plans, paid subscriptions, usage-based limits, add-ons, or enterprise plans. Plan features, limits, and pricing may vary and will be presented at checkout or in your account.',
           'We may change plan features or pricing prospectively, subject to notice where required by law or contract.',
         ],
       },
       {
         title: '4. Billing and Payments',
         body: [
-          'Paid subscriptions are billed in advance on a recurring basis unless otherwise stated. You authorize [Company Name] and its payment processors to charge applicable fees, taxes, and renewal amounts using your selected payment method.',
+          'Paid subscriptions are billed in advance on a recurring basis unless otherwise stated. You authorize opportuneo and its payment processors to charge applicable fees, taxes, and renewal amounts using your selected payment method.',
           'You are responsible for keeping payment information current. If payment fails, we may suspend or limit access until amounts are paid.',
         ],
       },
@@ -146,7 +146,7 @@ export const legalPages = {
       {
         title: '7. Intellectual Property',
         body: [
-          '[Company Name] owns the Service, software, design, branding, documentation, and related intellectual property. Subject to these Terms, we grant you a limited, non-exclusive, non-transferable right to use the Service during your subscription.',
+          'opportuneo owns the Service, software, design, branding, documentation, and related intellectual property. Subject to these Terms, we grant you a limited, non-exclusive, non-transferable right to use the Service during your subscription.',
           'You retain ownership of content and data you submit to the Service. You grant us the rights needed to host, process, transmit, display, and use that content to provide and improve the Service.',
         ],
       },
@@ -167,8 +167,8 @@ export const legalPages = {
       {
         title: '10. Limitation of Liability',
         body: [
-          'To the maximum extent permitted by law, [Company Name] will not be liable for indirect, incidental, special, consequential, exemplary, or punitive damages, or for lost profits, lost revenue, lost data, goodwill, or business interruption.',
-          'Our total liability for claims related to the Service will not exceed the amounts paid by you to [Company Name] for the Service in the twelve months before the event giving rise to the claim.',
+          'To the maximum extent permitted by law, opportuneo will not be liable for indirect, incidental, special, consequential, exemplary, or punitive damages, or for lost profits, lost revenue, lost data, goodwill, or business interruption.',
+          'Our total liability for claims related to the Service will not exceed the amounts paid by you to opportuneo for the Service in the twelve months before the event giving rise to the claim.',
         ],
       },
       {
@@ -192,7 +192,7 @@ export const legalPages = {
       {
         title: '14. Contact Information',
         body: [
-          'For questions about these Terms, contact [Company Name] at [Business Email] or [Business Address]. Website: [Website URL].',
+          'For questions about these Terms, contact opportuneo at [Business Email] or [Business Address]. Website: [Website URL].',
         ],
       },
     ],
@@ -202,7 +202,7 @@ export const legalPages = {
     title: 'Refund & Cancellation Policy',
     eyebrow: 'Billing',
     description:
-      'This policy explains how subscription cancellations, renewals, refund requests, and payment disputes are handled for [Product Name].',
+      'This policy explains how subscription cancellations, renewals, refund requests, and payment disputes are handled for opportuneo.',
     updated: '[Effective Date]',
     sections: [
       {
@@ -239,7 +239,7 @@ export const legalPages = {
       {
         title: '5. Plan Downgrades',
         body: [
-          'If you downgrade a plan, the change may take effect immediately or at the next billing cycle depending on billing configuration. Downgrades do not create automatic refunds or credits unless required by law or expressly approved by [Company Name].',
+          'If you downgrade a plan, the change may take effect immediately or at the next billing cycle depending on billing configuration. Downgrades do not create automatic refunds or credits unless required by law or expressly approved by opportuneo.',
         ],
       },
       {
@@ -253,13 +253,13 @@ export const legalPages = {
         title: '7. Refund Request Process',
         body: [
           'To request a refund, email [Business Email] with your account email, company name, invoice or transaction ID, charge date, amount, and a short explanation of the issue.',
-          'We may request additional information to verify the account and evaluate the request. Refund decisions are made at our reasonable discretion, subject to applicable law and any written agreement between you and [Company Name].',
+          'We may request additional information to verify the account and evaluate the request. Refund decisions are made at our reasonable discretion, subject to applicable law and any written agreement between you and opportuneo.',
         ],
       },
       {
         title: '8. Contact Information',
         body: [
-          'Billing questions, cancellation requests, and refund requests can be sent to [Business Email]. You may also contact [Company Name] at [Business Address]. Website: [Website URL].',
+          'Billing questions, cancellation requests, and refund requests can be sent to [Business Email]. You may also contact opportuneo at [Business Address]. Website: [Website URL].',
         ],
       },
     ],

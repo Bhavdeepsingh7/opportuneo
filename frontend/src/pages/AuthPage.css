@@ -6,7 +6,7 @@
 .auth-grid{position:absolute;inset:0;background-image:linear-gradient(var(--border) 1px,transparent 1px),linear-gradient(90deg,var(--border) 1px,transparent 1px);background-size:56px 56px;mask-image:radial-gradient(ellipse 80% 80% at 50% 50%,black 0%,transparent 100%)}
 .auth-card{position:relative;z-index:1;width:100%;max-width:420px;margin:auto 0;padding:40px;display:flex;flex-direction:column;gap:20px}
 .auth-logo{display:flex;align-items:center;gap:9px;margin-bottom:4px}
-.auth-logo-icon{font-size:22px;filter:drop-shadow(0 0 10px rgba(109,95,255,0.7))}
+.auth-logo-icon{display:inline-flex;align-items:center;justify-content:center;width:32px;height:32px;border:1px solid rgba(34,211,160,.26);border-radius:8px;background:var(--green-bg);color:var(--green);font-family:var(--font-head);font-size:12px;font-weight:900}
 .auth-logo-text{font-family:var(--font-head);font-size:20px;font-weight:900;letter-spacing:-0.03em;background:linear-gradient(135deg,#fff 0%,var(--accent3) 100%);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
 .auth-title{font-size:26px;font-weight:800}
 .auth-subtitle{font-size:14px;color:var(--text2);line-height:1.6;margin-top:-8px}

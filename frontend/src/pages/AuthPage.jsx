@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate } from 'react-router-dom'
+import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, Zap, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
 import Footer from '../components/Footer'
@@ -8,7 +8,8 @@ import './AuthPage.css'
 export default function AuthPage() {
   const { signInWithGoogle, signInWithEmail, signUpWithEmail } = useAuth()
   const navigate = useNavigate()
-  const [mode, setMode] = useState('login') // login | signup
+  const [searchParams] = useSearchParams()
+  const [mode, setMode] = useState(() => searchParams.get('mode') === 'signup' ? 'signup' : 'login') // login | signup
   const [email, setEmail] = useState('')
   const [password, setPassword] = useState('')
   const [showPass, setShowPass] = useState(false)
@@ -57,8 +58,8 @@ export default function AuthPage() {
 
       <div className="auth-card card fade-up">
         <div className="auth-logo">
-          <span className="auth-logo-icon">⚡</span>
-          <span className="auth-logo-text">OutreachAI</span>
+          <span className="auth-logo-icon">op</span>
+          <span className="auth-logo-text">opportuneo</span>
         </div>
 
         <h1 className="auth-title">
