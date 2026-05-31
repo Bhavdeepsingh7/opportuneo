@@ -130,7 +130,7 @@ function PlanCard({ plan, index }) {
             <p className="mt-2 text-sm leading-6 text-[var(--text2)]">{plan.description}</p>
           </div>
           {plan.featured && (
-            <span className="popular-badge rounded-full px-3 py-1 text-xs font-semibold text-[var(--accent3)]">
+            <span className="popular-badge rounded-full px-3 py-1 text-xs font-semibold text-[var(--accent3)] padding-5px">
               Most Popular
             </span>
           )}
@@ -295,16 +295,16 @@ export default function SubscriptionPage() {
           variants={stagger}
           initial="hidden"
           animate="show"
-          className="mx-auto max-w-4xl text-center"
+          className="mx-auto  text-center"
         >
           <Motion.div variants={fadeUp} className="pricing-eyebrow mx-auto inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-[var(--accent3)]">
             <Sparkles size={14} />
             AI-native job outreach
           </Motion.div>
-          <Motion.h1 variants={fadeUp} className="mt-7 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl">
+          <Motion.h1 variants={fadeUp} className="mt-7 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl width-100">
             Land More Interviews with Smarter Outreach
           </Motion.h1>
-          <Motion.p variants={fadeUp} className="mx-auto mt-6 max-w-2xl text-base leading-8 text-[var(--text2)] sm:text-lg">
+          <Motion.p variants={fadeUp} className="mx-auto mt-6 text-base leading-8 text-[var(--text2)] sm:text-lg width-100">
             Generate resume-aware emails, reach recruiters faster, and manage job outreach credits from one focused workspace.
           </Motion.p>
           <Motion.div variants={fadeUp} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
@@ -389,7 +389,7 @@ export default function SubscriptionPage() {
           </Motion.div>
         </Motion.section>
 
-        <Motion.section variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mx-auto mt-20 max-w-3xl">
+        <Motion.section variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mx-auto mt-20 ">
           <div className="mb-6 text-center">
             <h2 className="text-2xl font-semibold text-white sm:text-3xl">Questions, answered</h2>
           </div>
@@ -418,11 +418,11 @@ export default function SubscriptionPage() {
             transition={{ duration: 10, repeat: Infinity, ease: 'linear' }}
             style={{ backgroundImage: 'linear-gradient(120deg, rgba(109,95,255,.18), rgba(236,72,153,.12), rgba(34,211,160,.08))', backgroundSize: '220% 220%' }}
           />
-          <div className="relative z-10 mx-auto max-w-2xl">
-            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl">
+          <div className="relative z-10 mx-auto">
+            <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl width-100">
               Start your next job outreach campaign
             </h2>
-            <p className="mx-auto mt-4 max-w-xl text-sm leading-7 text-[var(--text2)]">
+            <p className="mx-auto mt-4 text-sm leading-7 text-[var(--text2)] width-100">
               Upload contacts, add your job context, and send personalized emails that sound like you.
             </p>
             <button type="button" className="cta-glow mt-8 inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-[var(--accent)] px-7 text-sm font-semibold text-white transition hover:bg-[var(--accent2)]">

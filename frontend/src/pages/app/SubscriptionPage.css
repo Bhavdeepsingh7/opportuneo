@@ -234,3 +234,7 @@
     padding-inline: 14px;
   }
 }
+
+.width-100 {
+  width: 100%;
+}
