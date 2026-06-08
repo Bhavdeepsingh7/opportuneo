@@ -1,14 +1,23 @@
+from contextlib import asynccontextmanager
+
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
-from app.routers import resume, contacts, emails, gmail
+from app.routers import resume, contacts, emails, gmail, payments
+from app.rabbitmq import close_rabbitmq
 
 settings = get_settings()
+
+@asynccontextmanager
+async def lifespan(_app: FastAPI):
+    yield
+    await close_rabbitmq()
 
 app = FastAPI(
     title="OutreachAI API",
     description="AI-powered job outreach email generator",
     version="1.0.0",
+    lifespan=lifespan,
 )
 
 # CORS — allow React frontend
@@ -25,6 +34,7 @@ app.include_router(resume.router,   prefix="/api")
 app.include_router(contacts.router, prefix="/api")
 app.include_router(emails.router,   prefix="/api")
 app.include_router(gmail.router,    prefix="/api")
+app.include_router(payments.router, prefix="/api")
 
 @app.get("/")
 def root():

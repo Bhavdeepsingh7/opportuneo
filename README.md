@@ -121,6 +121,18 @@ uvicorn main:app --reload --port 8000
 # API docs: http://localhost:8000/docs
 ```
 
+Start RabbitMQ and the campaign workers in separate terminals:
+
+```bash
+docker run -d --name outreach-rabbitmq -p 5672:5672 -p 15672:15672 rabbitmq:3-management
+
+cd backend
+python -m workers.email_worker
+python -m workers.dead_letter_worker
+```
+
+RabbitMQ management UI: `http://localhost:15672` (`guest` / `guest`).
+
 ### Frontend
 ```bash
 cd frontend
@@ -160,10 +172,14 @@ Step 5: Connect Gmail (OAuth) → Send all emails from your account
 | POST | `/api/contacts/parse` | Parse CSV/PDF contact list |
 | POST | `/api/emails/generate` | Generate personalized emails via Claude |
 | POST | `/api/emails/regenerate` | Regenerate one email with feedback |
-| POST | `/api/emails/send` | Send via Gmail OAuth |
+| POST | `/api/emails/send` | Queue asynchronous Gmail delivery |
 | GET | `/api/gmail/auth-url` | Get Google OAuth URL |
 | GET | `/api/gmail/callback` | Handle OAuth redirect |
 | POST | `/api/gmail/verify` | Verify stored token |
+| POST | `/api/payments/orders` | Create an authenticated Razorpay order |
+| POST | `/api/payments/verify` | Verify checkout payment and activate subscription |
+| GET | `/api/payments/subscription` | Load the authenticated user's subscription and credits |
+| POST | `/api/payments/webhook` | Process signed Razorpay `payment.captured` webhooks |
 
 ---
 
@@ -191,6 +207,12 @@ GOOGLE_CLIENT_SECRET=GOCSPX-...
 GOOGLE_REDIRECT_URI=https://your-backend.up.railway.app/api/gmail/callback
 FRONTEND_URL=https://your-frontend.vercel.app
 SECRET_KEY=random-32-char-string
+RAZORPAY_KEY_ID=rzp_test_...
+RAZORPAY_KEY_SECRET=...
+RAZORPAY_WEBHOOK_SECRET=...
+RABBITMQ_URL=amqp://guest:guest@localhost:5672
+RABBITMQ_QUEUE=campaign_queue
+RABBITMQ_DEAD_QUEUE=dead_letter_queue
 ```
 
 ### Frontend `.env`
@@ -199,6 +221,15 @@ VITE_SUPABASE_URL=https://xxx.supabase.co
 VITE_SUPABASE_ANON_KEY=eyJ...
 VITE_API_URL=https://your-backend.up.railway.app
 ```
+
+### Razorpay Test Mode
+
+1. Create Test Mode API keys in Razorpay and add them to the backend environment.
+2. Run the `profiles` migration statements in `supabase_schema.sql`.
+3. In Razorpay, create a webhook for `payment.captured` pointing to:
+   `https://your-backend.example.com/api/payments/webhook`
+4. Set the same webhook secret as `RAZORPAY_WEBHOOK_SECRET` in the backend.
+5. Use Razorpay test cards or test UPI IDs from the existing checkout page.
 
 ---
 

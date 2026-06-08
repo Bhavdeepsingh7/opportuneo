@@ -92,10 +92,8 @@ export default function Step5Send({ data, setData, prevStep }) {
         emails: payload,
         resume_file_path: data.resumeFilePath || null,
       })
-      setResults(res.data.results)
-      const { sent, failed } = res.data.summary || { sent: 0, failed: 0 }
-      if (failed === 0) toast.success(`All ${sent} emails sent!`)
-      else toast(`${sent} sent, ${failed} failed`)
+      setResults([])
+      toast.success(res.data.message || 'Campaign queued successfully')
     } catch (err) {
       toast.error(err.response?.data?.detail || 'Send failed — check Gmail connection')
     } finally {
@@ -206,8 +204,8 @@ export default function Step5Send({ data, setData, prevStep }) {
       ) : (
         <div className="space-y-3">
           <div className="oa-results rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-5">
-            <div className="text-sm font-semibold text-[var(--text)]">Send results</div>
-            <div className="mt-3 space-y-2">
+            <div className="text-sm font-semibold text-[var(--text)]">Campaign queued successfully</div>
+            {!!results.length && <div className="mt-3 space-y-2">
               {results.map((r, i) => (
                 <div
                   key={i}
@@ -221,7 +219,7 @@ export default function Step5Send({ data, setData, prevStep }) {
                   <div className="shrink-0 text-sm">{r.success ? '✅' : '❌'}</div>
                 </div>
               ))}
-            </div>
+            </div>}
           </div>
           <div className="text-xs text-[var(--text3)]">
             You can start a new campaign from the app menu (or refresh and use “Start over”).

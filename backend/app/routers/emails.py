@@ -1,9 +1,10 @@
-from fastapi import APIRouter, HTTPException, Body
+from fastapi import APIRouter, HTTPException
 from typing import List
 from pydantic import BaseModel
 from app.services.email_generator import generate_emails_for_contacts, regenerate_single_email
-from app.services.gmail_service import send_emails_via_gmail
-from app.models.schemas import ContactEntry, GeneratedEmail
+from app.models.schemas import ContactEntry
+from app.rabbitmq import publish_job
+from app.services.campaign_service import update_campaign_status
 
 router = APIRouter(prefix="/emails", tags=["emails"])
 
@@ -26,6 +27,7 @@ class SendRequest(BaseModel):
     from_email: str
     emails: List[dict]        # [{to, subject, body, contact_name}]
     resume_file_path: str | None = None
+    campaign_id: str | None = None
 
 @router.post("/generate")
 async def generate_emails(req: GenerateRequest):
@@ -57,27 +59,28 @@ async def regenerate_email(req: RegenerateRequest):
 
 @router.post("/send")
 async def send_emails(req: SendRequest):
-    """Send emails via the user's Gmail account (OAuth)."""
+    """Queue reviewed emails for asynchronous delivery through Gmail."""
     if not req.emails:
         raise HTTPException(status_code=400, detail="No emails to send")
     if not req.token_data:
         raise HTTPException(status_code=401, detail="Gmail not connected")
 
     try:
-        results = await send_emails_via_gmail(
-            token_data=req.token_data,
-            emails=req.emails,
-            from_name=req.from_name,
-            from_email=req.from_email,
-            resume_file_path=req.resume_file_path,
+        await publish_job(
+            {
+                "campaign_id": req.campaign_id,
+                "token_data": req.token_data,
+                "from_name": req.from_name,
+                "from_email": req.from_email,
+                "emails": req.emails,
+                "resume_file_path": req.resume_file_path,
+            }
         )
-    except (ValueError, FileNotFoundError) as e:
-        raise HTTPException(status_code=400, detail=str(e))
-
-    sent = sum(1 for r in results if r.success)
-    failed = sum(1 for r in results if not r.success)
+        await update_campaign_status(req.campaign_id, "queued")
+    except Exception as e:
+        raise HTTPException(status_code=503, detail="Could not queue campaign") from e
 
     return {
-        "results": [r.model_dump() for r in results],
-        "summary": {"sent": sent, "failed": failed, "total": len(results)},
+        "success": True,
+        "message": "Campaign queued successfully",
     }

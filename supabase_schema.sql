@@ -13,8 +13,24 @@ create table public.profiles (
   id          uuid primary key references auth.users(id) on delete cascade,
   full_name   text,
   avatar_url  text,
+  subscription_name text default 'Free',
+  subscription_status text default 'inactive',
+  available_credits integer default 0,
+  razorpay_order_id text,
+  razorpay_payment_id text,
+  razorpay_payment_ids text[] default '{}',
+  subscription_updated_at timestamptz,
   created_at  timestamptz default now()
 );
+
+-- Run these statements once if the profiles table already exists.
+alter table public.profiles add column if not exists subscription_name text default 'Free';
+alter table public.profiles add column if not exists subscription_status text default 'inactive';
+alter table public.profiles add column if not exists available_credits integer default 0;
+alter table public.profiles add column if not exists razorpay_order_id text;
+alter table public.profiles add column if not exists razorpay_payment_id text;
+alter table public.profiles add column if not exists razorpay_payment_ids text[] default '{}';
+alter table public.profiles add column if not exists subscription_updated_at timestamptz;
 
 -- Auto-create profile on signup
 create or replace function public.handle_new_user()

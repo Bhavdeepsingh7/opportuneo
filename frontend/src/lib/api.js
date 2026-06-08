@@ -24,3 +24,17 @@ export const sendEmails = (data) => api.post('/emails/send', data)
 export const getGmailAuthUrl  = ()           => api.get('/gmail/auth-url')
 export const getGmailTokens   = (sessionId)  => api.get(`/gmail/tokens/${sessionId}`)
 export const verifyGmailToken = (tokenData)  => api.post('/gmail/verify', { token_data: tokenData })
+
+// Razorpay checkout
+export const createPaymentOrder = (planId, accessToken) =>
+  api.post('/payments/orders', { plan_id: planId }, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+export const verifyPayment = (payment, accessToken) =>
+  api.post('/payments/verify', payment, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+export const getSubscription = (accessToken) =>
+  api.get('/payments/subscription', {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })

@@ -1,9 +1,13 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react'
+import { useAuth } from './AuthContext'
+import { getSubscription } from '../lib/api'
+import { supabase } from '../lib/supabase'
 
 const AppContext = createContext(null)
 
 export function AppProvider({ children }) {
+  const { user } = useAuth()
   // Wizard state persisted in sessionStorage
   const [resumeData, setResumeData] = useState(() => {
     try { return JSON.parse(sessionStorage.getItem('resumeData') || 'null') } catch { return null }
@@ -23,6 +27,7 @@ export function AppProvider({ children }) {
     return Number.isFinite(stored) && stored >= 0 ? stored : 0
   })
   const [subscriptionName, setSubscriptionName] = useState(() => sessionStorage.getItem('subscriptionName') || 'Free')
+  const [subscriptionStatus, setSubscriptionStatus] = useState(() => sessionStorage.getItem('subscriptionStatus') || 'inactive')
 
   // Gmail OAuth tokens (sessionStorage - cleared on tab close)
   const [gmailTokens, setGmailTokens] = useState(() => {
@@ -54,6 +59,25 @@ export function AppProvider({ children }) {
   useEffect(() => { sessionStorage.setItem('tone', tone) }, [tone])
   useEffect(() => { sessionStorage.setItem('availableCredits', String(availableCredits)) }, [availableCredits])
   useEffect(() => { sessionStorage.setItem('subscriptionName', subscriptionName) }, [subscriptionName])
+  useEffect(() => { sessionStorage.setItem('subscriptionStatus', subscriptionStatus) }, [subscriptionStatus])
+  useEffect(() => {
+    if (!user) return
+
+    let active = true
+    void supabase.auth.getSession().then(({ data: { session } }) => {
+      if (!session?.access_token) return null
+      return getSubscription(session.access_token)
+    }).then((response) => {
+      if (!active || !response) return
+      setAvailableCredits(response.data.available_credits)
+      setSubscriptionName(response.data.subscription_name)
+      setSubscriptionStatus(response.data.subscription_status)
+    }).catch(() => {
+      // Keep the last known browser state if the backend is temporarily unavailable.
+    })
+
+    return () => { active = false }
+  }, [user])
   useEffect(() => {
     if (gmailTokens) sessionStorage.setItem('gmailTokens', JSON.stringify(gmailTokens))
     else sessionStorage.removeItem('gmailTokens')
@@ -83,6 +107,7 @@ export function AppProvider({ children }) {
       gmailEmail, setGmailEmail,
       availableCredits, setAvailableCredits,
       subscriptionName, setSubscriptionName,
+      subscriptionStatus, setSubscriptionStatus,
       resetWizard,
     }}>
       {children}
