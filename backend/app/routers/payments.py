@@ -8,6 +8,8 @@ from pydantic import BaseModel
 
 from app.config import get_settings
 
+from app.dependencies import get_current_user, get_supabase_headers
+
 settings = get_settings()
 router = APIRouter(prefix="/payments", tags=["payments"])
 
@@ -32,32 +34,6 @@ def _razorpay_client() -> razorpay.Client:
     if not settings.razorpay_key_id or not settings.razorpay_key_secret:
         raise HTTPException(status_code=503, detail="Razorpay is not configured")
     return razorpay.Client(auth=(settings.razorpay_key_id, settings.razorpay_key_secret))
-
-
-def _supabase_headers(access_token: str | None = None) -> dict[str, str]:
-    if not settings.supabase_url or not settings.supabase_service_role_key:
-        raise HTTPException(status_code=503, detail="Supabase is not configured")
-    return {
-        "apikey": settings.supabase_service_role_key,
-        "Authorization": f"Bearer {access_token or settings.supabase_service_role_key}",
-        "Content-Type": "application/json",
-    }
-
-
-async def _current_user(authorization: str | None = Header(default=None)) -> dict[str, Any]:
-    if not authorization or not authorization.startswith("Bearer "):
-        raise HTTPException(status_code=401, detail="Authentication required")
-
-    access_token = authorization.removeprefix("Bearer ").strip()
-    async with httpx.AsyncClient(timeout=15) as client:
-        response = await client.get(
-            f"{settings.supabase_url}/auth/v1/user",
-            headers=_supabase_headers(access_token),
-        )
-
-    if response.status_code != 200:
-        raise HTTPException(status_code=401, detail="Invalid or expired session")
-    return response.json()
 
 
 def _plan_details(plan_id: str) -> dict[str, Any]:
@@ -88,7 +64,7 @@ async def _get_profile(user_id: str) -> dict[str, Any]:
         response = await client.get(
             f"{settings.supabase_url}/rest/v1/profiles",
             params={"id": f"eq.{user_id}", "select": "*"},
-            headers=_supabase_headers(),
+            headers=get_supabase_headers(),
         )
     if response.status_code != 200 or not response.json():
         raise HTTPException(status_code=500, detail="User profile was not found")
@@ -96,7 +72,7 @@ async def _get_profile(user_id: str) -> dict[str, Any]:
 
 
 async def _update_profile(user_id: str, updates: dict[str, Any]) -> dict[str, Any]:
-    headers = {**_supabase_headers(), "Prefer": "return=representation"}
+    headers = {**get_supabase_headers(), "Prefer": "return=representation"}
     async with httpx.AsyncClient(timeout=15) as client:
         response = await client.patch(
             f"{settings.supabase_url}/rest/v1/profiles",
@@ -159,12 +135,12 @@ async def _activate_payment(
 
 
 @router.get("/subscription")
-async def get_subscription(user: dict = Depends(_current_user)):
+async def get_subscription(user: dict = Depends(get_current_user)):
     return _profile_response(await _get_profile(user["id"]))
 
 
 @router.post("/orders")
-async def create_order(req: CreateOrderRequest, user: dict = Depends(_current_user)):
+async def create_order(req: CreateOrderRequest, user: dict = Depends(get_current_user)):
     plan = _plan_details(req.plan_id)
     order = _razorpay_client().order.create(
         {
@@ -189,7 +165,7 @@ async def create_order(req: CreateOrderRequest, user: dict = Depends(_current_us
 
 
 @router.post("/verify")
-async def verify_payment(req: VerifyPaymentRequest, user: dict = Depends(_current_user)):
+async def verify_payment(req: VerifyPaymentRequest, user: dict = Depends(get_current_user)):
     client = _razorpay_client()
     try:
         client.utility.verify_payment_signature(req.model_dump())

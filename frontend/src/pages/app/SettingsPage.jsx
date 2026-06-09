@@ -45,6 +45,8 @@ export default function SettingsPage() {
   const connectGmail = async () => {
     try {
       const res = await getGmailAuthUrl()
+      console.log("AUTH_URL_RESPONSE", res.data.url)
+      console.log("REDIRECTING_TO", res.data.url)
       window.location.href = res.data.url
     } catch { toast.error('Could not start Gmail OAuth') }
   }

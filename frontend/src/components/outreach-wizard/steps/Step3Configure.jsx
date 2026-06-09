@@ -1,7 +1,10 @@
 import { useMemo, useState } from 'react'
-import { AlertCircle, ArrowRight, Sparkles } from 'lucide-react'
+import { AlertCircle, ArrowRight, Sparkles, Zap } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { generateEmails } from '../../../lib/api'
+import { useAuth } from '../../../context/AuthContext'
+import { useAppState } from '../../../context/AppContext'
+import { supabase } from '../../../lib/supabase'
 import './Step3Configure.css'
 
 const TONES = [
@@ -11,30 +14,49 @@ const TONES = [
 ]
 
 export default function Step3Configure({ data, setData, nextStep, prevStep }) {
+  const { availableCredits, setAvailableCredits } = useAppState()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
 
+  const contactCount = Array.isArray(data.contacts) ? data.contacts.length : 0
+
   const canGenerate = useMemo(() => {
     const hasResume = !!(data.resumeData && Object.keys(data.resumeData).length)
-    const hasContacts = Array.isArray(data.contacts) && data.contacts.length > 0
+    const hasContacts = contactCount > 0
     return hasResume && hasContacts && !loading
-  }, [data.contacts, data.resumeData, loading])
+  }, [contactCount, data.resumeData, loading])
 
   const handleGenerate = async () => {
     setError('')
+    
+    if (availableCredits < contactCount) {
+      setError(`Insufficient credits. You need ${contactCount} credits but have ${availableCredits}.`)
+      toast.error('Insufficient credits')
+      return
+    }
+
     setLoading(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const res = await generateEmails({
         resume_data: data.resumeData,
         contacts: data.contacts,
         job_context: data.jobContext,
         tone: data.tone,
-      })
+      }, session?.access_token)
+      
       setData({ generatedEmails: res.data.emails })
+      if (res.data.available_credits !== undefined) {
+        setAvailableCredits(res.data.available_credits)
+      }
       toast.success(`${res.data.emails?.length || 0} emails generated`)
       nextStep()
     } catch (err) {
-      setError(err.response?.data?.detail || err.message || 'Generation failed')
+      if (err.response?.status === 402) {
+        setError('Insufficient credits. Please upgrade your plan.')
+      } else {
+        setError(err.response?.data?.detail || err.message || 'Generation failed')
+      }
     } finally {
       setLoading(false)
     }
@@ -59,10 +81,26 @@ export default function Step3Configure({ data, setData, nextStep, prevStep }) {
         <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-4 padding-5px">
           <div className="text-xs font-semibold text-[var(--text3)]">Contacts</div>
           <div className="mt-1 text-sm font-semibold text-[var(--text)]">
-            {Array.isArray(data.contacts) ? data.contacts.length : 0} recipients
+            {contactCount} recipients
           </div>
         </div>
       </div>
+
+      {availableCredits < contactCount && contactCount > 0 && (
+        <div className="flex items-center gap-3 rounded-2xl border border-[rgba(255,152,0,.2)] bg-[rgba(255,152,0,.05)] p-4">
+          <Zap size={20} className="text-[#FF9800]" />
+          <div className="flex-1">
+            <div className="text-sm font-semibold text-[#FF9800]">Credits required: {contactCount}</div>
+            <div className="text-xs text-[var(--text3)]">You currently have {availableCredits} credits.</div>
+          </div>
+          <a 
+            href="/app/subscription" 
+            className="text-xs font-bold text-[#FF9800] underline hover:no-underline"
+          >
+            Upgrade
+          </a>
+        </div>
+      )}
 
       <div className="space-y-2">
         <div className="text-xs font-semibold text-[var(--text2)]">Job context (optional)</div>
@@ -129,7 +167,7 @@ export default function Step3Configure({ data, setData, nextStep, prevStep }) {
           ) : (
             <>
               <Sparkles size={16} />
-              Generate emails
+              Generate {contactCount > 0 ? `${contactCount} ` : ''}emails
               <ArrowRight size={16} />
             </>
           )}
@@ -138,4 +176,3 @@ export default function Step3Configure({ data, setData, nextStep, prevStep }) {
     </div>
   )
 }
-

@@ -13,7 +13,10 @@ from googleapiclient.discovery import build
 from app.config import get_settings
 from app.models.schemas import EmailSendResult
 
+import logging
+
 settings = get_settings()
+logger = logging.getLogger(__name__)
 
 # Include openid — Google always returns it; without it the library raises "Scope has changed"
 SCOPES = [
@@ -27,8 +30,8 @@ def _make_flow():
     return Flow.from_client_config(
         {
             "web": {
-                "client_id": settings.google_client_id,
-                "client_secret": settings.google_client_secret,
+                "client_id": settings.google_client_id_web,
+                "client_secret": settings.google_client_secret_web,
                 "auth_uri": "https://accounts.google.com/o/oauth2/auth",
                 "token_uri": "https://oauth2.googleapis.com/token",
                 "redirect_uris": [settings.google_redirect_uri],
@@ -40,18 +43,27 @@ def _make_flow():
 
 def get_gmail_auth_url() -> str:
     """Return Google OAuth URL for frontend redirect."""
+    logger.info("DEBUG: Gmail OAuth Flow Initiation")
+    logger.info(f"DEBUG: Using Client ID: {settings.google_client_id_web}")
+    logger.info(f"DEBUG: Using Redirect URI: {settings.google_redirect_uri}")
+    logger.info(f"DEBUG: Using Scopes: {SCOPES}")
+    
     flow = _make_flow()
     auth_url, _ = flow.authorization_url(
         access_type="offline",
         include_granted_scopes="false",  # prevents scope-change errors
         prompt="consent",
     )
+    
+    logger.info("GENERATED AUTH URL=%s", auth_url)
     return auth_url
 
 def exchange_code_for_tokens(code: str) -> dict:
     """Exchange OAuth code for access + refresh tokens."""
     # Allow the library to accept extra scopes returned by Google
     os.environ["OAUTHLIB_RELAX_TOKEN_SCOPE"] = "1"
+    # Allow HTTP for local development
+    os.environ["OAUTHLIB_INSECURE_TRANSPORT"] = "1"
 
     flow = _make_flow()
     flow.fetch_token(code=code)
@@ -70,8 +82,8 @@ def _build_creds(token_data: dict) -> Credentials:
         token=token_data["access_token"],
         refresh_token=token_data.get("refresh_token"),
         token_uri=token_data.get("token_uri", "https://oauth2.googleapis.com/token"),
-        client_id=token_data.get("client_id", settings.google_client_id),
-        client_secret=token_data.get("client_secret", settings.google_client_secret),
+        client_id=token_data.get("client_id", settings.google_client_id_web),
+        client_secret=token_data.get("client_secret", settings.google_client_secret_web),
         scopes=token_data.get("scopes", SCOPES),
     )
     if creds.expired and creds.refresh_token:

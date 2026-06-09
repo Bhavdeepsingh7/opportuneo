@@ -44,10 +44,11 @@ Return ONLY valid JSON, no markdown fences, no explanation:
   "name": "Full Name",
   "current_title": "Most recent job title",
   "current_company": "Most recent company",
-  "years_experience": 5,
+  "years_experience": years,
   "top_skills": ["skill1", "skill2", "skill3", "skill4", "skill5"],
   "key_achievements": ["specific achievement with metric", "another achievement"],
   "education": "Degree and school",
+  "projects": ["brief description of key projects showcasing skills and impact"],
   "summary": "2-3 sentence professional summary highlighting what makes them stand out"
 }}
 

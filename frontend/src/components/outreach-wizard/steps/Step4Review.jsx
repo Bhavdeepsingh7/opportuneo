@@ -1,12 +1,17 @@
 import { useMemo, useState } from 'react'
-import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, Copy, Save } from 'lucide-react'
+import { AlertCircle, ArrowRight, ChevronDown, ChevronUp, Copy, Save, Sparkles, Zap } from 'lucide-react'
 import toast from 'react-hot-toast'
+import { regenerateEmail } from '../../../lib/api'
+import { useAppState } from '../../../context/AppContext'
+import { supabase } from '../../../lib/supabase'
 import './Step4Review.css'
 
 export default function Step4Review({ data, setData, nextStep, prevStep }) {
+  const { availableCredits, setAvailableCredits } = useAppState()
   const emails = Array.isArray(data.generatedEmails) ? data.generatedEmails : []
   const [expanded, setExpanded] = useState(0)
   const [editing, setEditing] = useState({})
+  const [loadingRegen, setLoadingRegen] = useState(null) // index of email being regenerated
 
   const canContinue = emails.length > 0
 
@@ -30,6 +35,59 @@ export default function Step4Review({ data, setData, nextStep, prevStep }) {
     const e = getEmail(idx)
     await navigator.clipboard.writeText(`Subject: ${e.subject}\n\n${e.body}`)
     toast.success('Copied')
+  }
+
+  const handleRegenerate = async (idx) => {
+    if (availableCredits < 1) {
+      toast.error('Insufficient credits to regenerate')
+      return
+    }
+
+    const feedback = window.prompt("Any specific improvements? (Optional)")
+    if (feedback === null) return // Cancelled
+
+    setLoadingRegen(idx)
+    try {
+      const { data: { session } } = await supabase.auth.getSession()
+      const email = emails[idx]
+      const res = await regenerateEmail({
+        resume_data: data.resumeData,
+        contact: email.contact,
+        job_context: data.jobContext,
+        tone: data.tone,
+        feedback: feedback
+      }, session?.access_token)
+
+      // Update emails list
+      const updated = [...emails]
+      updated[idx] = {
+        contact: email.contact,
+        subject: res.data.subject,
+        body: res.data.body,
+        variant: res.data.variant
+      }
+      setData({ generatedEmails: updated })
+      
+      // Clear edits for this one
+      setEditing(prev => {
+        const next = { ...prev }
+        delete next[idx]
+        return next
+      })
+
+      if (res.data.available_credits !== undefined) {
+        setAvailableCredits(res.data.available_credits)
+      }
+      toast.success('Email regenerated')
+    } catch (err) {
+      if (err.response?.status === 402) {
+        toast.error('Insufficient credits')
+      } else {
+        toast.error(err.response?.data?.detail || err.message || 'Regeneration failed')
+      }
+    } finally {
+      setLoadingRegen(null)
+    }
   }
 
   if (!emails.length) {
@@ -84,6 +142,7 @@ export default function Step4Review({ data, setData, nextStep, prevStep }) {
           const isOpen = expanded === idx
           const recipient = e.contact?.name || e.contact?.email || `Recipient ${idx + 1}`
           const subtitle = [e.contact?.title, e.contact?.company].filter(Boolean).join(' · ')
+          const isRegenerating = loadingRegen === idx
 
           return (
             <div key={idx} className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)]">
@@ -126,6 +185,18 @@ export default function Step4Review({ data, setData, nextStep, prevStep }) {
                     >
                       <Copy size={14} /> Copy
                     </button>
+                    <button
+                      className="inline-flex items-center justify-center gap-2 rounded-xl border border-[var(--border)] bg-[rgba(109,95,255,.05)] px-3 py-2 text-xs font-semibold text-[var(--accent)] transition hover:border-[rgba(109,95,255,.25)] hover:bg-[rgba(109,95,255,.1)] disabled:opacity-50"
+                      onClick={() => handleRegenerate(idx)}
+                      disabled={isRegenerating}
+                    >
+                      {isRegenerating ? (
+                        <span className="h-3 w-3 animate-spin rounded-full border-2 border-[var(--accent)]/30 border-t-[var(--accent)]" />
+                      ) : (
+                        <Sparkles size={14} />
+                      )}
+                      Regenerate (1 <Zap size={10} className="inline fill-current" />)
+                    </button>
                   </div>
                 </div>
               )}
@@ -155,4 +226,3 @@ export default function Step4Review({ data, setData, nextStep, prevStep }) {
     </div>
   )
 }
-

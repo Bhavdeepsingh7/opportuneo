@@ -110,6 +110,44 @@ create table public.generated_emails (
 );
 
 -- ============================================================
+-- Credit Management Functions (RPC)
+-- ============================================================
+
+-- Deduct credits atomically. Returns updated balance.
+create or replace function public.deduct_credits(u_id uuid, amount int)
+returns int language plpgsql security definer as $$
+declare
+  remaining_credits int;
+begin
+  update public.profiles
+  set available_credits = available_credits - amount
+  where id = u_id and available_credits >= amount
+  returning available_credits into remaining_credits;
+
+  if not found then
+    raise exception 'Insufficient credits';
+  end if;
+
+  return remaining_credits;
+end;
+$$;
+
+-- Refund credits. Returns updated balance.
+create or replace function public.refund_credits(u_id uuid, amount int)
+returns int language plpgsql security definer as $$
+declare
+  remaining_credits int;
+begin
+  update public.profiles
+  set available_credits = available_credits + amount
+  where id = u_id
+  returning available_credits into remaining_credits;
+
+  return remaining_credits;
+end;
+$$;
+
+-- ============================================================
 -- RLS Policies — users only see their own data
 -- ============================================================
 alter table public.profiles        enable row level security;

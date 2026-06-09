@@ -2,9 +2,7 @@ import { useEffect } from 'react'
 import { Outlet, useNavigate, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useAppState } from '../context/AppContext'
-import {
-  LayoutDashboard, Settings, LogOut, DollarSign, Coins
-} from 'lucide-react'
+import { LayoutDashboard, Settings, LogOut, DollarSign, Coins, Zap } from 'lucide-react'
 import Footer from '../components/Footer'
 import './AppShell.css'
 
@@ -19,7 +17,6 @@ export default function AppShell() {
   const { user, loading, signOut } = useAuth()
   const { availableCredits, subscriptionName } = useAppState()
   const navigate = useNavigate()
-  const formattedCredits = new Intl.NumberFormat('en-IN').format(availableCredits || 0)
 
   useEffect(() => {
     if (!loading && !user) navigate('/auth')
@@ -63,9 +60,21 @@ export default function AppShell() {
         </div>
 
         <div className="sidebar-bottom-wrap">
-          <div className="subscription-pill" title={`Current subscription: ${subscriptionName}`}>
-            <span>Subscription</span>
-            <strong>{subscriptionName}</strong>
+          <div className="user-pill-info mb-3 px-3">
+             <div className="flex items-center justify-between gap-2 rounded-xl bg-[var(--bg3)] p-3 ring-1 ring-[var(--border)]">
+                <div className="flex flex-col">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text3)]">Credits</span>
+                  <div className="flex items-center gap-1 text-[var(--accent)]">
+                    <Zap size={12} className="fill-current" />
+                    <span className="text-sm font-bold">{new Intl.NumberFormat('en-IN').format(availableCredits || 0)}</span>
+                  </div>
+                </div>
+                <div className="h-8 w-px bg-[var(--border)]" />
+                <div className="flex flex-col text-right">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-[var(--text3)]">Plan</span>
+                  <span className="text-sm font-bold text-[var(--text)]">{subscriptionName}</span>
+                </div>
+             </div>
           </div>
 
           <div className="sidebar-bottom">
@@ -93,9 +102,9 @@ export default function AppShell() {
       {/* Main */}
       <main className="shell-main">
         <header className="shell-topbar" aria-label="Account credits">
-          <div className="credits-pill" title={`${formattedCredits} email credits available`}>
-            <Coins size={16} />
-            <span>{formattedCredits}</span>
+          <div className="credits-pill" title={`${availableCredits} email credits available`}>
+            <Zap size={14} className="fill-current" />
+            <span>{new Intl.NumberFormat('en-IN').format(availableCredits || 0)}</span>
             <small>credits</small>
           </div>
         </header>

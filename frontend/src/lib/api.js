@@ -16,12 +16,22 @@ export const parseContacts = (formData) =>
   api.post('/contacts/parse', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
 
 // Emails
-export const generateEmails = (data) => api.post('/emails/generate', data)
-export const regenerateEmail = (data) => api.post('/emails/regenerate', data)
+export const generateEmails = (data, accessToken) =>
+  api.post('/emails/generate', data, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
+export const regenerateEmail = (data, accessToken) =>
+  api.post('/emails/regenerate', data, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
 export const sendEmails = (data) => api.post('/emails/send', data)
 
 // Gmail OAuth
-export const getGmailAuthUrl  = ()           => api.get('/gmail/auth-url')
+export const getGmailAuthUrl  = async () => {
+  const response = await api.get('/gmail/auth-url')
+  console.log("AUTH_URL_RESPONSE", response.data.url)
+  return response
+}
 export const getGmailTokens   = (sessionId)  => api.get(`/gmail/tokens/${sessionId}`)
 export const verifyGmailToken = (tokenData)  => api.post('/gmail/verify', { token_data: tokenData })
 

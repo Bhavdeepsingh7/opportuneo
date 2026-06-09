@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Zap, LayoutDashboard, Settings, LogOut, Menu, X, ChevronRight, DollarSign } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import { useAppState } from '../context/AppContext'
 import './AppShell.css'
 
 const NAV = [
@@ -12,6 +13,7 @@ const NAV = [
 
 export default function AppShell({ children }) {
   const { user, signOut } = useAuth()
+  const { availableCredits, subscriptionName } = useAppState()
   const navigate = useNavigate()
   const location = useLocation()
   const [mobileOpen, setMobileOpen] = useState(false)
@@ -39,7 +41,7 @@ export default function AppShell({ children }) {
               className={`nav-item ${isActive(path) ? 'active' : ''}`}
               onClick={() => { navigate(path); setMobileOpen(false) }}
             >
-              {NavIcon({ size: 16 })}
+              <NavIcon size={16} />
               {label}
             </button>
           ))}
@@ -52,7 +54,13 @@ export default function AppShell({ children }) {
             </div>
             <div className="user-info">
               <span className="user-email">{user?.email || 'User'}</span>
-              <span className="user-plan">Free plan</span>
+              <div className="flex items-center gap-1.5">
+                <span className="user-plan">{subscriptionName}</span>
+                <span className="flex items-center gap-0.5 rounded-full bg-[var(--glow2)] px-1.5 py-0.5 text-[10px] font-bold text-[var(--accent)] ring-1 ring-[rgba(109,95,255,.2)]">
+                  <Zap size={10} className="fill-current" />
+                  {availableCredits}
+                </span>
+              </div>
             </div>
           </div>
           <button className="btn btn-ghost btn-sm sign-out-btn" onClick={handleSignOut}>
