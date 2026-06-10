@@ -34,7 +34,7 @@ app.include_router(resume.router,   prefix="/api")
 app.include_router(contacts.router, prefix="/api")
 app.include_router(emails.router,   prefix="/api")
 app.include_router(gmail.router,    prefix="/api")
-app.include_router(payments.router, prefix="/api")
+# app.include_router(payments.router, prefix="/api")
 app.include_router(users.router,    prefix="/api")
 
 @app.get("/")
