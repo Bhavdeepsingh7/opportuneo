@@ -3,7 +3,7 @@ from contextlib import asynccontextmanager
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from app.config import get_settings
-from app.routers import resume, contacts, emails, gmail, payments, users
+from app.routers import resume, contacts, emails, gmail,  users # removed payments tempororily
 from app.rabbitmq import close_rabbitmq
 
 settings = get_settings()
