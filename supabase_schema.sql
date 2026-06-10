@@ -70,10 +70,16 @@ create table public.campaigns (
 create table public.resumes (
   id            uuid primary key default uuid_generate_v4(),
   user_id       uuid references auth.users(id) on delete cascade not null,
+  filename      text,
+  is_default    boolean default false,
   raw_text      text,
   parsed_data   jsonb,   -- ParseResumeResponse shape
   created_at    timestamptz default now()
 );
+
+-- Run these statements once if the resumes table already exists.
+alter table public.resumes add column if not exists filename text;
+alter table public.resumes add column if not exists is_default boolean default false;
 
 -- ============================================================
 -- Contacts

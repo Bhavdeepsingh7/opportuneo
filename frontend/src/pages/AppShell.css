@@ -215,7 +215,7 @@
   min-height: 34px;
   padding: 0 12px;
   border: 1px solid rgba(34, 211, 160, .24);
-  border-radius: 999px;
+  border-radius: 9999px;
   background: var(--green-bg);
   color: var(--green);
   font-size: 13px;
@@ -231,6 +231,7 @@
   flex: 1;
   min-width: 0;
 }
+
 
 /* Wizard bar */
 .wizard-bar {

@@ -34,6 +34,31 @@ export const getGmailAuthUrl  = async () => {
 }
 export const getGmailTokens   = (sessionId)  => api.get(`/gmail/tokens/${sessionId}`)
 export const verifyGmailToken = (tokenData)  => api.post('/gmail/verify', { token_data: tokenData })
+export const linkGmail = (email, accessToken) =>
+  api.post('/gmail/link', { email }, { headers: { Authorization: `Bearer ${accessToken}` } })
+export const disconnectGmail = (accessToken) =>
+  api.post('/gmail/disconnect', {}, { headers: { Authorization: `Bearer ${accessToken}` } })
+
+// Resumes
+export const getDefaultResume = (accessToken) =>
+  api.get('/resume/default', { headers: { Authorization: `Bearer ${accessToken}` } })
+export const uploadDefaultResume = (formData, accessToken) =>
+  api.post('/resume/upload-default', formData, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  })
+export const deleteDefaultResume = (accessToken) =>
+  api.delete('/resume/default', { headers: { Authorization: `Bearer ${accessToken}` } })
+
+// Users
+export const getProfile = (accessToken) =>
+  api.get('/users/profile', { headers: { Authorization: `Bearer ${accessToken}` } })
+export const updateProfile = (data, accessToken) =>
+  api.patch('/users/profile', data, { headers: { Authorization: `Bearer ${accessToken}` } })
+export const deleteAccount = (accessToken) =>
+  api.delete('/users/account', { headers: { Authorization: `Bearer ${accessToken}` } })
 
 // Razorpay checkout
 export const createPaymentOrder = (planId, accessToken) =>

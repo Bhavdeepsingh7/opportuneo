@@ -64,17 +64,6 @@ const plans = [
   },
 ]
 
-const comparison = [
-  ['Monthly email credits', '1,000', '5,000', '20,000'],
-  ['Resume-aware email generation', true, true, true],
-  ['CSV contact upload', true, true, true],
-  ['Gmail sending workflow', true, true, true],
-  ['Multiple job-context campaigns', false, true, true],
-  ['Follow-up sequence support', false, true, true],
-  ['Candidate-wise organization', false, false, true],
-  ['Priority support', false, true, true],
-]
-
 const faqs = [
   ['Can I cancel anytime?', 'Yes. You can cancel or change your plan anytime from billing settings. Your remaining monthly credits stay available until the billing cycle ends.'],
   ['Can I buy extra email credits?', 'Yes. Extra credits cost Rs 1 per credit including GST, with a minimum purchase of 50 credits.'],
@@ -237,12 +226,6 @@ function CustomCreditsCard() {
   )
 }
 
-function ValueCell({ value }) {
-  if (value === true) return <Check className="mx-auto text-[var(--green)]" size={18} />
-  if (value === false) return <X className="mx-auto text-[var(--text3)]" size={17} />
-  return <span className="font-semibold text-[var(--text)]">{value}</span>
-}
-
 function FaqItem({ item, open, onClick }) {
   return (
     <div className="faq-card rounded-2xl">
@@ -276,6 +259,7 @@ function FaqItem({ item, open, onClick }) {
 
 export default function SubscriptionPage() {
   const [openFaq, setOpenFaq] = useState(0)
+  const navigate = useNavigate()
 
   return (
     <main className="pricing-page">
@@ -326,41 +310,6 @@ export default function SubscriptionPage() {
           {plans.map((plan, index) => (
             <PlanCard key={plan.name} plan={plan} index={index} />
           ))}
-        </Motion.section>
-
-        <Motion.section variants={fadeUp} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.18 }} className="mt-20">
-          <div className="mb-6 flex flex-col justify-between gap-3 sm:flex-row sm:items-end">
-            <div>
-              <h2 className="text-2xl font-semibold text-white sm:text-3xl">Compare job outreach plans</h2>
-              <p className="mt-2 text-sm text-[var(--text2)]">Choose the email credit volume that matches your search.</p>
-            </div>
-          </div>
-          <div className="compare-panel rounded-[24px] p-2">
-            <table className="compare-table w-full text-left text-sm">
-              <thead>
-                <tr>
-                  <th className="rounded-tl-[18px] px-5 py-4 text-[var(--text2)]">Feature</th>
-                  {plans.map((plan, i) => (
-                    <th key={plan.name} className={`px-5 py-4 text-center text-white ${i === plans.length - 1 ? 'rounded-tr-[18px]' : ''}`}>
-                      {plan.name}
-                    </th>
-                  ))}
-                </tr>
-              </thead>
-              <tbody>
-                {comparison.map((row) => (
-                  <tr key={row[0]}>
-                    <td className="px-5 py-4 text-[var(--text2)]">{row[0]}</td>
-                    {row.slice(1).map((value, i) => (
-                      <td key={`${row[0]}-${i}`} className="px-5 py-4 text-center">
-                        <ValueCell value={value} />
-                      </td>
-                    ))}
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
         </Motion.section>
 
         <Motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-20">
@@ -425,7 +374,11 @@ export default function SubscriptionPage() {
             <p className="mx-auto mt-4 text-sm leading-7 text-[var(--text2)] width-100">
               Upload contacts, add your job context, and send personalized emails that sound like you.
             </p>
-            <button type="button" className="cta-glow mt-8 inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-[var(--accent)] px-7 text-sm font-semibold text-white transition hover:bg-[var(--accent2)]">
+            <button 
+              type="button" 
+              className="cta-glow mt-8 inline-flex min-h-14 items-center justify-center gap-2 rounded-2xl bg-[var(--accent)] px-7 text-sm font-semibold text-white transition hover:bg-[var(--accent2)]"
+              onClick={() => navigate('/app/dashboard')}
+            >
               Get started
               <ArrowRight size={17} />
             </button>

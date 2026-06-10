@@ -1,4 +1,8 @@
-.shell { display: flex; min-height: 100vh; }
+.shell { 
+  display: flex; 
+  height: 100vh; 
+  overflow: hidden;
+}
 
 .sidebar {
   width: 220px;
@@ -7,10 +11,8 @@
   border-right: 1px solid var(--border);
   display: flex;
   flex-direction: column;
-  position: sticky;
-  top: 0;
   height: 100vh;
-  overflow-y: auto;
+  overflow: hidden;
 }
 
 .sidebar-logo {
@@ -115,7 +117,14 @@
 .sign-out-btn { width: 100%; justify-content: center; }
 
 /* Main */
-.shell-main { flex: 1; display: flex; flex-direction: column; min-width: 0; overflow: hidden; }
+.shell-main { 
+  flex: 1; 
+  display: flex; 
+  flex-direction: column; 
+  min-width: 0; 
+  height: 100vh;
+  overflow: hidden; 
+}
 
 .mobile-topbar {
   display: none;

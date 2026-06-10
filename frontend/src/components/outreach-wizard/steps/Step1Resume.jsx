@@ -1,12 +1,14 @@
-import { useCallback, useMemo, useState } from 'react'
+import { useCallback, useMemo, useState, useEffect } from 'react'
 import { useDropzone } from 'react-dropzone'
-import { AlertCircle, ArrowRight, FileText, Upload, X } from 'lucide-react'
+import { AlertCircle, ArrowRight, FileText, Upload, X, CheckCircle2 } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { parseResume } from '../../../lib/api'
+import { useAppState } from '../../../context/AppContext'
 import './Step1Resume.css'
 
 
 export default function Step1Resume({ data, setData, nextStep }) {
+  const { defaultResume } = useAppState()
   const [mode, setMode] = useState('upload') // upload | paste
   const [file, setFile] = useState(null)
   const [pasteText, setPasteText] = useState('')
@@ -14,6 +16,17 @@ export default function Step1Resume({ data, setData, nextStep }) {
   const [error, setError] = useState('')
 
   const parsed = data.resumeData
+
+  // Auto-fill from default resume if available and not already set
+  useEffect(() => {
+    if (defaultResume && !parsed) {
+      setData({
+        resumeData: defaultResume.parsed_data,
+        resumeRaw: defaultResume.raw_text,
+        resumeFilePath: '', // Default resume might not have a path in temp_dir anymore
+      })
+    }
+  }, [defaultResume, parsed, setData])
 
   const onDrop = useCallback((accepted) => {
     if (accepted?.[0]) {
@@ -90,6 +103,15 @@ export default function Step1Resume({ data, setData, nextStep }) {
           Paste text
         </button>
       </div>
+
+      {defaultResume && !file && mode === 'upload' && (
+        <div className="flex items-center gap-2 rounded-xl bg-[var(--bg3)] p-3 ring-1 ring-[var(--border)]">
+          <CheckCircle2 size={16} className="text-[var(--green)]" />
+          <div className="text-xs text-[var(--text2)]">
+            Using your <strong>default resume</strong>. You can upload a different one below.
+          </div>
+        </div>
+      )}
 
       {mode === 'upload' ? (
         <div

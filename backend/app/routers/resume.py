@@ -1,16 +1,91 @@
-from fastapi import APIRouter, UploadFile, File, HTTPException, Form
+from fastapi import APIRouter, UploadFile, File, HTTPException, Form, Depends
 import os
 import uuid
+import httpx
 
 from app.services.resume_service import extract_resume_text, parse_resume_with_ai
+from app.dependencies import get_current_user, get_supabase_headers
+from app.config import get_settings
 
+settings = get_settings()
 router = APIRouter(prefix="/resume", tags=["resume"])
 
 # Config
 TEMP_DIR = "temp"
 MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB
-ALLOWED_TYPES = ["application/pdf"]
+ALLOWED_TYPES = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"]
 
+
+@router.get("/default")
+async def get_default_resume(user: dict = Depends(get_current_user)):
+    """Get the user's default resume."""
+    async with httpx.AsyncClient() as client:
+        res = await client.get(
+            f"{settings.supabase_url}/rest/v1/resumes?user_id=eq.{user['id']}&is_default=eq.true&select=*",
+            headers=get_supabase_headers()
+        )
+    if res.status_code != 200:
+        return None
+    data = res.json()
+    return data[0] if data else None
+
+@router.post("/upload-default")
+async def upload_default_resume(
+    file: UploadFile = File(...),
+    user: dict = Depends(get_current_user)
+):
+    """Upload, parse, and set a resume as default."""
+    if file.content_type not in ALLOWED_TYPES:
+        raise HTTPException(status_code=400, detail="Unsupported file type")
+
+    content = await file.read()
+    if len(content) > MAX_FILE_SIZE:
+        raise HTTPException(status_code=400, detail="File too large")
+
+    # Parse
+    try:
+        raw_text = extract_resume_text(content, file.content_type or "")
+        parsed = await parse_resume_with_ai(raw_text)
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Parsing failed: {str(e)}")
+
+    # Save to Supabase
+    async with httpx.AsyncClient() as client:
+        # 1. Unset existing default
+        await client.patch(
+            f"{settings.supabase_url}/rest/v1/resumes?user_id=eq.{user['id']}&is_default=eq.true",
+            headers=get_supabase_headers(),
+            json={"is_default": False}
+        )
+        # 2. Insert new default
+        res = await client.post(
+            f"{settings.supabase_url}/rest/v1/resumes",
+            headers=get_supabase_headers(),
+            json={
+                "user_id": user["id"],
+                "filename": file.filename,
+                "is_default": True,
+                "raw_text": raw_text,
+                "parsed_data": parsed
+            }
+        )
+    
+    if res.status_code not in [200, 201, 204]:
+        raise HTTPException(status_code=500, detail="Failed to save resume")
+    
+    return {"success": True, "filename": file.filename, "parsed": parsed}
+
+@router.delete("/default")
+async def delete_default_resume(user: dict = Depends(get_current_user)):
+    """Delete the default resume."""
+    async with httpx.AsyncClient() as client:
+        res = await client.delete(
+            f"{settings.supabase_url}/rest/v1/resumes?user_id=eq.{user['id']}&is_default=eq.true",
+            headers=get_supabase_headers()
+        )
+    if res.status_code not in [200, 201, 204]:
+        raise HTTPException(status_code=500, detail="Failed to delete resume")
+    return {"success": True}
 
 @router.post("/parse")
 async def parse_resume(

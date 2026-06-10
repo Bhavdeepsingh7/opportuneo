@@ -1,7 +1,7 @@
 /* eslint-disable react-refresh/only-export-components */
 import { createContext, useContext, useState, useEffect } from 'react'
 import { useAuth } from './AuthContext'
-import { getSubscription } from '../lib/api'
+import { getSubscription, getProfile, getDefaultResume } from '../lib/api'
 import { supabase } from '../lib/supabase'
 
 const AppContext = createContext(null)
@@ -28,6 +28,8 @@ export function AppProvider({ children }) {
   })
   const [subscriptionName, setSubscriptionName] = useState(() => sessionStorage.getItem('subscriptionName') || 'Free')
   const [subscriptionStatus, setSubscriptionStatus] = useState(() => sessionStorage.getItem('subscriptionStatus') || 'inactive')
+  const [profile, setProfile] = useState(null)
+  const [defaultResume, setDefaultResume] = useState(null)
 
   // Gmail OAuth tokens (sessionStorage - cleared on tab close)
   const [gmailTokens, setGmailTokens] = useState(() => {
@@ -60,24 +62,51 @@ export function AppProvider({ children }) {
   useEffect(() => { sessionStorage.setItem('availableCredits', String(availableCredits)) }, [availableCredits])
   useEffect(() => { sessionStorage.setItem('subscriptionName', subscriptionName) }, [subscriptionName])
   useEffect(() => { sessionStorage.setItem('subscriptionStatus', subscriptionStatus) }, [subscriptionStatus])
+  
   useEffect(() => {
-    if (!user) return
+    if (!user) {
+      setProfile(null)
+      setDefaultResume(null)
+      return
+    }
 
     let active = true
-    void supabase.auth.getSession().then(({ data: { session } }) => {
-      if (!session?.access_token) return null
-      return getSubscription(session.access_token)
-    }).then((response) => {
-      if (!active || !response) return
-      setAvailableCredits(response.data.available_credits)
-      setSubscriptionName(response.data.subscription_name)
-      setSubscriptionStatus(response.data.subscription_status)
-    }).catch(() => {
-      // Keep the last known browser state if the backend is temporarily unavailable.
-    })
+    const fetchData = async () => {
+      const { data: { session } } = await supabase.auth.getSession()
+      if (!session?.access_token) return
 
+      try {
+        const [subRes, profRes, resRes] = await Promise.all([
+          getSubscription(session.access_token).catch(() => null),
+          getProfile(session.access_token).catch(() => null),
+          getDefaultResume(session.access_token).catch(() => null)
+        ])
+
+        if (!active) return
+
+        if (subRes?.data) {
+          setAvailableCredits(subRes.data.available_credits)
+          setSubscriptionName(subRes.data.subscription_name)
+          setSubscriptionStatus(subRes.data.subscription_status)
+        }
+        if (profRes?.data) {
+          setProfile(profRes.data)
+          if (profRes.data.gmail_email && !gmailEmail) {
+            setGmailEmail(profRes.data.gmail_email)
+          }
+        }
+        if (resRes?.data) {
+          setDefaultResume(resRes.data)
+        }
+      } catch (err) {
+        console.error("Failed to fetch app data", err)
+      }
+    }
+
+    fetchData()
     return () => { active = false }
-  }, [user])
+  }, [user, gmailEmail])
+
   useEffect(() => {
     if (gmailTokens) sessionStorage.setItem('gmailTokens', JSON.stringify(gmailTokens))
     else sessionStorage.removeItem('gmailTokens')
@@ -108,6 +137,8 @@ export function AppProvider({ children }) {
       availableCredits, setAvailableCredits,
       subscriptionName, setSubscriptionName,
       subscriptionStatus, setSubscriptionStatus,
+      profile, setProfile,
+      defaultResume, setDefaultResume,
       resetWizard,
     }}>
       {children}
