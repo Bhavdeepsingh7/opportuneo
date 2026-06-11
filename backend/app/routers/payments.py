@@ -1,8 +1,9 @@
+import hmac
+import hashlib
 from datetime import datetime, timezone
 from typing import Any
 
 import httpx
-import razorpay
 from fastapi import APIRouter, Depends, Header, HTTPException, Request
 from pydantic import BaseModel
 
@@ -30,13 +31,46 @@ class VerifyPaymentRequest(BaseModel):
     razorpay_signature: str
 
 
-def _razorpay_client() -> razorpay.Client:
-    if not settings.razorpay_key_id or not settings.razorpay_key_secret:
-        raise HTTPException(status_code=503, detail="Razorpay is not configured")
-    return razorpay.Client(auth=(settings.razorpay_key_id, settings.razorpay_key_secret))
+def _verify_payment_signature(order_id: str, payment_id: str, signature: str) -> bool:
+    """Manual implementation of Razorpay payment signature verification."""
+    if not settings.razorpay_key_secret:
+        return False
+    msg = f"{order_id}|{payment_id}"
+    expected = hmac.new(
+        settings.razorpay_key_secret.encode("utf-8"),
+        msg.encode("utf-8"),
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+
+def _verify_webhook_signature(body: str, signature: str) -> bool:
+    """Manual implementation of Razorpay webhook signature verification."""
+    if not settings.razorpay_webhook_secret:
+        return False
+    expected = hmac.new(
+        settings.razorpay_webhook_secret.encode("utf-8"),
+        body.encode("utf-8"),
+        hashlib.sha256
+    ).hexdigest()
+    return hmac.compare_digest(expected, signature)
+
+
+async def _fetch_order(order_id: str) -> dict[str, Any]:
+    """Fetch order details directly from Razorpay API."""
+    auth = (settings.razorpay_key_id, settings.razorpay_key_secret)
+    async with httpx.AsyncClient(timeout=15) as client:
+        response = await client.get(
+            f"https://api.razorpay.com/v1/orders/{order_id}",
+            auth=auth,
+        )
+    if response.status_code != 200:
+        raise HTTPException(status_code=502, detail="Could not fetch order from Razorpay")
+    return response.json()
 
 
 def _plan_details(plan_id: str) -> dict[str, Any]:
+
     if plan_id in PLANS:
         return {"id": plan_id, **PLANS[plan_id], "purchase_type": "subscription"}
 
@@ -141,21 +175,35 @@ async def get_subscription(user: dict = Depends(get_current_user)):
 
 @router.post("/orders")
 async def create_order(req: CreateOrderRequest, user: dict = Depends(get_current_user)):
+    if not settings.razorpay_key_id or not settings.razorpay_key_secret:
+        raise HTTPException(status_code=503, detail="Razorpay is not configured")
+
     plan = _plan_details(req.plan_id)
-    order = _razorpay_client().order.create(
-        {
-            "amount": plan["amount"],  # Razorpay expects the smallest currency unit (paise).
-            "currency": "INR",
-            "receipt": f"{user['id'][:8]}-{int(datetime.now(timezone.utc).timestamp())}",
-            "notes": {
-                "user_id": user["id"],
-                "plan_id": plan["id"],
-                "plan_name": plan["name"],
-                "credits": str(plan["credits"]),
-                "purchase_type": plan["purchase_type"],
-            },
-        }
-    )
+    payload = {
+        "amount": plan["amount"],  # Razorpay expects the smallest currency unit (paise).
+        "currency": "INR",
+        "receipt": f"{user['id'][:8]}-{int(datetime.now(timezone.utc).timestamp())}",
+        "notes": {
+            "user_id": user["id"],
+            "plan_id": plan["id"],
+            "plan_name": plan["name"],
+            "credits": str(plan["credits"]),
+            "purchase_type": plan["purchase_type"],
+        },
+    }
+
+    auth = (settings.razorpay_key_id, settings.razorpay_key_secret)
+    async with httpx.AsyncClient(timeout=15) as client:
+        response = await client.post(
+            "https://api.razorpay.com/v1/orders",
+            auth=auth,
+            json=payload,
+        )
+
+    if response.status_code != 200:
+        raise HTTPException(status_code=502, detail="Could not create order with Razorpay")
+
+    order = response.json()
     return {
         "order_id": order["id"],
         "amount": order["amount"],
@@ -166,15 +214,14 @@ async def create_order(req: CreateOrderRequest, user: dict = Depends(get_current
 
 @router.post("/verify")
 async def verify_payment(req: VerifyPaymentRequest, user: dict = Depends(get_current_user)):
-    client = _razorpay_client()
-    try:
-        client.utility.verify_payment_signature(req.model_dump())
-        order = client.order.fetch(req.razorpay_order_id)
-    except razorpay.errors.SignatureVerificationError as exc:
-        raise HTTPException(status_code=400, detail="Payment signature verification failed") from exc
-    except Exception as exc:
-        raise HTTPException(status_code=502, detail="Could not verify payment with Razorpay") from exc
+    if not _verify_payment_signature(
+        req.razorpay_order_id,
+        req.razorpay_payment_id,
+        req.razorpay_signature
+    ):
+        raise HTTPException(status_code=400, detail="Payment signature verification failed")
 
+    order = await _fetch_order(req.razorpay_order_id)
     plan = _validated_order_plan(order, user["id"])
     activated = await _activate_payment(
         user["id"],
@@ -195,15 +242,11 @@ async def razorpay_webhook(
     if not razorpay_signature:
         raise HTTPException(status_code=400, detail="Missing Razorpay webhook signature")
 
-    body = await request.body()
-    try:
-        _razorpay_client().utility.verify_webhook_signature(
-            body.decode("utf-8"),
-            razorpay_signature,
-            settings.razorpay_webhook_secret,
-        )
-    except razorpay.errors.SignatureVerificationError as exc:
-        raise HTTPException(status_code=400, detail="Invalid Razorpay webhook signature") from exc
+    body_bytes = await request.body()
+    body_str = body_bytes.decode("utf-8")
+
+    if not _verify_webhook_signature(body_str, razorpay_signature):
+        raise HTTPException(status_code=400, detail="Invalid Razorpay webhook signature")
 
     event = await request.json()
     if event.get("event") != "payment.captured":
@@ -216,7 +259,7 @@ async def razorpay_webhook(
         raise HTTPException(status_code=400, detail="Webhook payment data is incomplete")
 
     try:
-        order = _razorpay_client().order.fetch(order_id)
+        order = await _fetch_order(order_id)
         plan = _validated_order_plan(order)
         user_id = (order.get("notes") or {}).get("user_id")
         if not user_id:
@@ -228,3 +271,4 @@ async def razorpay_webhook(
         raise HTTPException(status_code=502, detail="Could not process Razorpay webhook") from exc
 
     return {"received": True, "processed": True, **activated}
+
