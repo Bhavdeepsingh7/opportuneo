@@ -1,0 +1,7 @@
+[build]
+builder = "nixpacks"
+
+[deploy]
+startCommand = "python -m workers.dead_letter_worker"
+restartPolicyType = "on_failure"
+# No healthcheck for worker
