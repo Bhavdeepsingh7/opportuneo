@@ -2,6 +2,7 @@ import os
 import base64
 import json
 import mimetypes
+import tempfile
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 from email.mime.base import MIMEBase
@@ -12,6 +13,7 @@ from google.auth.transport.requests import Request
 from googleapiclient.discovery import build
 from app.config import get_settings
 from app.models.schemas import EmailSendResult
+from app.services.storage_service import storage_service
 
 import logging
 
@@ -97,20 +99,6 @@ def get_gmail_user_email(token_data: dict) -> str:
     user_info = service.userinfo().get().execute()
     return user_info.get("email", "")
 
-def _get_allowed_attachment_path(file_path: Optional[str]) -> Optional[str]:
-    if not file_path:
-        return None
-
-    backend_root = os.path.abspath(os.path.join(os.path.dirname(__file__), "..", ".."))
-    temp_root = os.path.abspath(os.path.join(backend_root, "temp"))
-    candidate = os.path.abspath(file_path)
-
-    if os.path.commonpath([candidate, temp_root]) != temp_root:
-        raise ValueError("Attachment must be inside the backend temp directory")
-    if not os.path.isfile(candidate):
-        raise FileNotFoundError("Resume attachment file was not found")
-
-    return candidate
 
 def _attach_file(msg: MIMEMultipart, file_path: str) -> None:
     mime_type, _ = mimetypes.guess_type(file_path)
@@ -165,18 +153,41 @@ async def send_emails_via_gmail(
     service = build("gmail", "v1", credentials=creds)
     results = []
     from_header = f"{from_name} <{from_email}>"
-    attachment_path = _get_allowed_attachment_path(resume_file_path)
+    
+    temp_resume_path = None
+    try:
+        if resume_file_path:
+            logger.info(f"Downloading resume from Supabase: {resume_file_path}")
+            try:
+                # 1. Download from Supabase
+                content = await storage_service.download_file("resumes", resume_file_path)
+                
+                # 2. Save to temporary file
+                suffix = os.path.splitext(resume_file_path)[1] or ".pdf"
+                with tempfile.NamedTemporaryFile(delete=False, suffix=suffix) as tmp:
+                    tmp.write(content)
+                    temp_resume_path = tmp.name
+            except Exception as e:
+                logger.error(f"Failed to download resume for attachment: {str(e)}")
+                # We continue without attachment if download fails? 
+                # Or fail all emails? Given requirement #8, we should probably fail.
+                return [EmailSendResult(email=e.get("to", ""), success=False, error=f"Attachment download failed: {str(e)}") for e in emails]
 
-    for email_data in emails:
-        to = email_data.get("to", "")
-        subject = email_data.get("subject", "")
-        body = email_data.get("body", "")
-        try:
-            message = _build_message(from_header, to, subject, body, attachment_path)
-            sent = service.users().messages().send(userId="me", body=message).execute()
-            results.append(EmailSendResult(email=to, success=True, message_id=sent.get("id", "")))
-        except Exception as e:
-            results.append(EmailSendResult(email=to, success=False, error=str(e)))
+        for email_data in emails:
+            to = email_data.get("to", "")
+            subject = email_data.get("subject", "")
+            body = email_data.get("body", "")
+            try:
+                message = _build_message(from_header, to, subject, body, temp_resume_path)
+                sent = service.users().messages().send(userId="me", body=message).execute()
+                results.append(EmailSendResult(email=to, success=True, message_id=sent.get("id", "")))
+            except Exception as e:
+                results.append(EmailSendResult(email=to, success=False, error=str(e)))
+
+    finally:
+        # 3. Clean up temp file
+        if temp_resume_path and os.path.exists(temp_resume_path):
+            os.remove(temp_resume_path)
 
     return results
 
@@ -191,3 +202,4 @@ def plain_to_html(text: str) -> str:
 <div style="max-width:580px;margin:0 auto;background:#fff;border-radius:10px;padding:44px;border:1px solid #e5e7eb;">
 {html_paras}
 </div></body></html>"""
+

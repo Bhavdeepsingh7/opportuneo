@@ -4,6 +4,7 @@ import uuid
 import httpx
 
 from app.services.resume_service import extract_resume_text, parse_resume_with_ai
+from app.services.storage_service import storage_service
 from app.dependencies import get_current_user, get_supabase_headers
 from app.config import get_settings
 
@@ -11,9 +12,9 @@ settings = get_settings()
 router = APIRouter(prefix="/resume", tags=["resume"])
 
 # Config
-TEMP_DIR = "temp"
 MAX_FILE_SIZE = 2 * 1024 * 1024  # 2MB
 ALLOWED_TYPES = ["application/pdf", "application/vnd.openxmlformats-officedocument.wordprocessingml.document", "text/plain"]
+STORAGE_BUCKET = "resumes"
 
 
 @router.get("/default")
@@ -42,22 +43,35 @@ async def upload_default_resume(
     if len(content) > MAX_FILE_SIZE:
         raise HTTPException(status_code=400, detail="File too large")
 
-    # Parse
+    # 1. Upload to Supabase Storage
+    safe_filename = f"{uuid.uuid4()}_{file.filename}"
+    storage_path = f"{user['id']}/{safe_filename}"
+    try:
+        await storage_service.upload_file(
+            bucket=STORAGE_BUCKET,
+            path=storage_path,
+            content=content,
+            content_type=file.content_type or "application/octet-stream"
+        )
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"File upload failed: {str(e)}")
+
+    # 2. Parse
     try:
         raw_text = extract_resume_text(content, file.content_type or "")
         parsed = await parse_resume_with_ai(raw_text)
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Parsing failed: {str(e)}")
 
-    # Save to Supabase
+    # 3. Save to Supabase DB
     async with httpx.AsyncClient() as client:
-        # 1. Unset existing default
+        # Unset existing default
         await client.patch(
             f"{settings.supabase_url}/rest/v1/resumes?user_id=eq.{user['id']}&is_default=eq.true",
             headers=get_supabase_headers(),
             json={"is_default": False}
         )
-        # 2. Insert new default
+        # Insert new default
         res = await client.post(
             f"{settings.supabase_url}/rest/v1/resumes",
             headers=get_supabase_headers(),
@@ -66,14 +80,15 @@ async def upload_default_resume(
                 "filename": file.filename,
                 "is_default": True,
                 "raw_text": raw_text,
-                "parsed_data": parsed
+                "parsed_data": parsed,
+                "storage_path": storage_path
             }
         )
     
     if res.status_code not in [200, 201, 204]:
         raise HTTPException(status_code=500, detail="Failed to save resume")
     
-    return {"success": True, "filename": file.filename, "parsed": parsed}
+    return {"success": True, "filename": file.filename, "parsed": parsed, "storage_path": storage_path}
 
 @router.delete("/default")
 async def delete_default_resume(user: dict = Depends(get_current_user)):
@@ -94,10 +109,10 @@ async def parse_resume(
 ):
     """
     Parse resume from uploaded file or pasted text.
-    Returns raw text + structured parsed data + file path (if uploaded).
+    Returns raw text + structured parsed data + storage path (if uploaded).
     """
 
-    file_path = None
+    storage_path = None
     raw_text = ""
 
     # -------------------------
@@ -108,10 +123,10 @@ async def parse_resume(
         if file.content_type not in ALLOWED_TYPES:
             raise HTTPException(
                 status_code=400,
-                detail="Only PDF files are allowed",
+                detail="Unsupported file type. Allowed: PDF, DOCX, TXT",
             )
 
-        # Read file once
+        # Read file
         content = await file.read()
 
         # Validate size
@@ -121,16 +136,22 @@ async def parse_resume(
                 detail="File too large (max 2MB)",
             )
 
-        # Ensure temp directory exists
-        os.makedirs(TEMP_DIR, exist_ok=True)
-
-        # Safe filename
+        # Safe filename & upload to Supabase
         safe_filename = f"{uuid.uuid4()}_{file.filename}"
-        file_path = os.path.join(TEMP_DIR, safe_filename)
-
-        # Save file
-        with open(file_path, "wb") as f:
-            f.write(content)
+        storage_path = f"uploads/{safe_filename}"
+        
+        try:
+            await storage_service.upload_file(
+                bucket=STORAGE_BUCKET,
+                path=storage_path,
+                content=content,
+                content_type=file.content_type or "application/octet-stream"
+            )
+        except Exception as e:
+            raise HTTPException(
+                status_code=500,
+                detail=f"Failed to upload to storage: {str(e)}"
+            )
 
         # Extract text
         raw_text = extract_resume_text(content, file.content_type or "")
@@ -176,5 +197,5 @@ async def parse_resume(
     return {
         "raw_text": raw_text,
         "parsed": parsed,
-        "file_path": file_path  # important for email attachment later
+        "file_path": storage_path  # We keep 'file_path' key for frontend compatibility
     }

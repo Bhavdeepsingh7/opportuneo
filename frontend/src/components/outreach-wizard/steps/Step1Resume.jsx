@@ -23,7 +23,7 @@ export default function Step1Resume({ data, setData, nextStep }) {
       setData({
         resumeData: defaultResume.parsed_data,
         resumeRaw: defaultResume.raw_text,
-        resumeFilePath: '', // Default resume might not have a path in temp_dir anymore
+        resumeFilePath: defaultResume.storage_path || '',
       })
     }
   }, [defaultResume, parsed, setData])
