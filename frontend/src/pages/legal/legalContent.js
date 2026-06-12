@@ -5,7 +5,7 @@ export const legalPages = {
     eyebrow: 'Legal',
     description:
       'This Privacy Policy explains how Opportuneo collects, uses, shares, and protects information when you use Opportuneo.',
-    updated: '[Effective Date]',
+    updated: '11-06-2026',
     sections: [
       {
         title: '1. Information We Collect',
@@ -72,7 +72,7 @@ export const legalPages = {
         title: '10. User Rights',
         body: [
           'Depending on your location, you may have rights to access, correct, export, delete, restrict, or object to certain processing of your personal information. You may also have the right to withdraw consent where processing is based on consent.',
-          'To exercise rights, contact [Business Email]. We may need to verify your identity before completing a request.',
+          'To exercise rights, contact Bhavdeepmakkar@gmail.com. We may need to verify your identity before completing a request.',
         ],
       },
       {
@@ -84,7 +84,7 @@ export const legalPages = {
       {
         title: '12. Contact Information',
         body: [
-          'If you have questions about this Privacy Policy or our privacy practices, contact us at [Business Email] or write to Opportuneo, [Business Address]. Website: [Website URL].',
+          'If you have questions about this Privacy Policy or our privacy practices, contact us at Bhavdeepmakkar@gmail.com. Website: https://www.opportuneo.in/ .',
         ],
       },
     ],
@@ -95,7 +95,7 @@ export const legalPages = {
     eyebrow: 'Legal',
     description:
       'These Terms & Conditions govern your access to and use of Opportuneo, an AI job outreach SaaS platform operated by Opportuneo.',
-    updated: '[Effective Date]',
+    updated: '11-06-2026',
     sections: [
       {
         title: '1. Acceptance of Terms',
@@ -108,7 +108,7 @@ export const legalPages = {
         title: '2. User Accounts',
         body: [
           'You must provide accurate account information and keep it up to date. You are responsible for maintaining the confidentiality of your login credentials and for all activity under your account.',
-          'You must promptly notify us at [Business Email] if you suspect unauthorized access or misuse of your account.',
+          'You must promptly notify us at Bhavdeepmakkar@gmail.com if you suspect unauthorized access or misuse of your account.',
         ],
       },
       {
@@ -180,7 +180,7 @@ export const legalPages = {
       {
         title: '12. Changes to Service or Terms',
         body: [
-          'We may update the Service and these Terms from time to time. If changes are material, we will provide notice by reasonable means such as email, in-app notice, or posting on [Website URL]. Continued use after changes become effective means you accept the updated Terms.',
+          'We may update the Service and these Terms from time to time. If changes are material, we will provide notice by reasonable means such as email, in-app notice, or posting on https://www.opportuneo.in/ . Continued use after changes become effective means you accept the updated Terms.',
         ],
       },
       {
@@ -192,7 +192,7 @@ export const legalPages = {
       {
         title: '14. Contact Information',
         body: [
-          'For questions about these Terms, contact Opportuneo at [Business Email] or [Business Address]. Website: [Website URL].',
+          'For questions about these Terms, contact Opportuneo at Bhavdeepmakkar@gmail.com . Website: https://www.opportuneo.in/ .',
         ],
       },
     ],
@@ -208,7 +208,7 @@ export const legalPages = {
       {
         title: '1. Subscription Cancellation Rules',
         body: [
-          'You may cancel your paid subscription at any time from your account billing settings or by contacting [Business Email]. Cancellation stops future renewal charges but does not automatically refund amounts already paid.',
+          'You may cancel your paid subscription at any time from your account billing settings or by contacting Bhavdeepmakkar@gmail.com . Cancellation stops future renewal charges but does not automatically refund amounts already paid.',
           'After cancellation, you may continue to access paid features until the end of the then-current billing period unless your account is terminated for violation of our Terms & Conditions.',
         ],
       },
@@ -245,21 +245,21 @@ export const legalPages = {
       {
         title: '6. Chargeback Policy',
         body: [
-          'If you believe a charge is incorrect, contact [Business Email] before initiating a chargeback so we can investigate and resolve the issue quickly.',
+          'If you believe a charge is incorrect, contact Bhavdeepmakkar@gmail.com before initiating a chargeback so we can investigate and resolve the issue quickly.',
           'We reserve the right to suspend account access, pause services, or close accounts associated with improper, fraudulent, or unresolved chargebacks. Chargebacks do not cancel active subscriptions unless confirmed in writing or through your billing settings.',
         ],
       },
       {
         title: '7. Refund Request Process',
         body: [
-          'To request a refund, email [Business Email] with your account email, company name, invoice or transaction ID, charge date, amount, and a short explanation of the issue.',
+          'To request a refund, email Bhavdeepmakkar@gmail.com with your account email, company name, invoice or transaction ID, charge date, amount, and a short explanation of the issue.',
           'We may request additional information to verify the account and evaluate the request. Refund decisions are made at our reasonable discretion, subject to applicable law and any written agreement between you and Opportuneo.',
         ],
       },
       {
         title: '8. Contact Information',
         body: [
-          'Billing questions, cancellation requests, and refund requests can be sent to [Business Email]. You may also contact Opportuneo at [Business Address]. Website: [Website URL].',
+          'Billing questions, cancellation requests, and refund requests can be sent to Bhavdeepmakkar@gmail.com. You may also contact Opportuneo at https://www.opportuneo.in/. Website: https://www.opportuneo.in/.',
         ],
       },
     ],
