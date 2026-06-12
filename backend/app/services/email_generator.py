@@ -62,17 +62,69 @@ def _validate_generated_email(data: dict, contact: ContactEntry) -> None:
     body = _normalize_body(str(data.get("body", "")))
     word_count = len(re.findall(r"\b\w+\b", body))
     paragraphs = [p for p in body.split("\n\n") if p.strip()]
+    
     role = (contact.title or "").strip()
     company = (contact.company or "").strip()
+    body_lower = body.lower()
 
+    # 1. Company Match (Robust)
+    company_found = False
+    if not company:
+        company_found = True
+    else:
+        if company.lower() in body_lower:
+            company_found = True
+        else:
+            # Variations: strip common suffixes
+            simplified = re.sub(
+                r"\s+(inc|corp|ltd|llc|incorporated|corporation|group|solutions|technologies|systems|lab|labs)\.?$", 
+                "", 
+                company, 
+                flags=re.I
+            ).strip()
+            if len(simplified) >= 3 and simplified.lower() in body_lower:
+                company_found = True
+
+    # 2. Role Match (Robust / Keyword-based)
+    role_found = False
+    if not role:
+        role_found = True
+    else:
+        if role.lower() in body_lower:
+            role_found = True
+        else:
+            # Significant keywords only
+            noise = {
+                "senior", "junior", "lead", "staff", "principal", "ii", "iii", "level", "associate", 
+                "trainee", "intern", "sr", "jr", "manager", "director", "vp", "head", "specialist"
+            }
+            keywords = [w for w in re.findall(r"\b\w+\b", role.lower()) if w not in noise and len(w) > 2]
+            if keywords and all(kw in body_lower for kw in keywords):
+                role_found = True
+
+    # 3. Validation Rules
+    errors = []
     if not subject:
-        raise ValueError("Model returned an empty subject")
+        errors.append("Empty subject line")
     if word_count < 90:
-        raise ValueError(f"Generated body too short ({word_count} words)")
+        errors.append(f"Body too short ({word_count} words, target 120-180)")
     if len(paragraphs) < 3:
-        raise ValueError("Generated body did not contain enough paragraph structure")
-    if company and company.lower() not in body.lower() and (role and role.lower() not in body.lower()):
-        raise ValueError("Generated body did not reference the company or recipient role")
+        errors.append(f"Insufficient structure ({len(paragraphs)} paragraphs)")
+    
+    # Requirement: Company or Role must be mentioned
+    if not company_found and not role_found:
+        logger.error(
+            f"EMAIL_VALIDATION_FAILURE:\n"
+            f"  Recipient: {contact.name}\n"
+            f"  Company: '{company}' (Match: {company_found})\n"
+            f"  Role: '{role}' (Match: {role_found})\n"
+            f"  Body snippet: {body[:200]}...\n"
+            f"  Full Body: {body}"
+        )
+        errors.append(f"Generated body did not reference the company ('{company}') or role ('{role}')")
+
+    if errors:
+        raise ValueError("; ".join(errors))
 
 
 def _fallback_email(profile_name: str, current_title: str, contact: ContactEntry) -> GeneratedEmail:
