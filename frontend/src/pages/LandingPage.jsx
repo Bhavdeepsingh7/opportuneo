@@ -19,7 +19,7 @@ const features = [
   {
     icon: Coins,
     title: 'Simple email credits',
-    copy: 'Starter, Pro, and Agency plans include monthly credits. Extra credits cost Rs 1 including GST.',
+    copy: 'Starter, Pro, and Agency plans include monthly credits. Extra credits cost Rs 1.',
   },
 ]
 
@@ -130,7 +130,7 @@ export default function LandingPage() {
       <section id="pricing" className="landing-section">
         <div className="landing-section__heading">
           <h2>Simple pricing for every outreach volume.</h2>
-          <p>All prices include GST. Buy extra credits anytime with a minimum purchase of 50 credits.</p>
+          <p>Buy extra credits anytime with a minimum purchase of 50 credits.</p>
         </div>
         <div className="landing-plan-grid">
           {plans.map(([name, price, credits]) => (
@@ -146,7 +146,7 @@ export default function LandingPage() {
       <section className="landing-cta">
         <ShieldCheck size={22} />
         <h2>Build a better job search pipeline today.</h2>
-        <p>Secure signup, GST-inclusive checkout, and instant plan activation after successful payment.</p>
+        <p>Secure signup, focused checkout, and instant plan activation after successful payment.</p>
         <Link to="/auth?mode=signup" className="landing-button landing-button--primary">
           Create your account
           <ArrowRight size={17} />

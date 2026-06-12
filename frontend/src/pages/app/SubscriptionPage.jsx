@@ -66,7 +66,7 @@ const plans = [
 
 const faqs = [
   ['Can I cancel anytime?', 'Yes. You can cancel or change your plan anytime from billing settings. Your remaining monthly credits stay available until the billing cycle ends.'],
-  ['Can I buy extra email credits?', 'Yes. Extra credits cost Rs 1 per credit including GST, with a minimum purchase of 50 credits.'],
+  ['Can I buy extra email credits?', 'Yes. Extra credits cost Rs 1 per credit, with a minimum purchase of 50 credits.'],
   ['What counts as one credit?', 'One generated or sent job outreach email uses one email credit.'],
   ['Can I upgrade later?', 'Absolutely. Upgrades are instant, and your campaigns, contacts, and job-context settings move with you.'],
 ]
@@ -171,11 +171,11 @@ function CustomCreditsCard() {
         plan: {
           id: `custom-credits-${normalizedCredits}`,
           name: 'Custom email credits',
-          description: `${normalizedCredits.toLocaleString('en-IN')} extra job outreach email credits at Rs 1 per credit including GST.`,
+          description: `${normalizedCredits.toLocaleString('en-IN')} extra job outreach email credits at Rs 1 per credit.`,
           monthlyPrice: total,
           features: [
             `${normalizedCredits.toLocaleString('en-IN')} extra email credits`,
-            'Rs 1 per credit including GST',
+            'Rs 1 per credit',
             'Credits added after successful payment',
             'Use for job outreach email generation and sending',
           ],
@@ -195,7 +195,7 @@ function CustomCreditsCard() {
           </div>
           <h2 className="mt-5 text-2xl font-semibold text-white sm:text-3xl">Buy custom email credits</h2>
           <p className="mt-3 text-sm leading-6 text-[var(--text2)]">
-            Need more job outreach volume this month? Buy extra credits anytime. Each credit costs Rs 1 including GST.
+            Need more job outreach volume this month? Buy extra credits anytime. Each credit costs Rs 1.
           </p>
         </div>
 
@@ -213,7 +213,7 @@ function CustomCreditsCard() {
           />
           <p id="custom-credit-help" className="form-hint">Minimum purchase is 50 credits.</p>
           <div className="custom-credits-total">
-            <span>Total including GST</span>
+            <span>Total Payable</span>
             <strong>{formatCurrency(total)}</strong>
           </div>
           <button type="button" className="cta-glow custom-credits-button" onClick={buyCredits}>
@@ -293,7 +293,7 @@ export default function SubscriptionPage() {
           </Motion.p>
           <Motion.div variants={fadeUp} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <span className="save-badge rounded-full px-4 py-2 text-xs font-semibold text-[var(--green)]">
-              All prices include GST
+              Subscription pricing
             </span>
           </Motion.div>
         </Motion.section>
@@ -327,7 +327,7 @@ export default function SubscriptionPage() {
           <Motion.div variants={fadeUp} className="mt-5 grid gap-4 md:grid-cols-3">
             {[
               ['1 credit', 'per generated or sent email'],
-              ['Rs 1', 'per extra credit including GST'],
+              ['Rs 1', 'per extra credit'],
               ['50', 'minimum custom credit purchase'],
             ].map(([stat, label]) => (
               <div key={stat} className="trust-card rounded-[22px] p-5">

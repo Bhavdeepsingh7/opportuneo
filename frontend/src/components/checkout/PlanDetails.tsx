@@ -13,9 +13,6 @@ export function PlanDetails({ plan }: PlanDetailsProps) {
 
   return (
     <section className="checkout-section" aria-labelledby="checkout-plan-title">
-      <div className="checkout-plan__topline">
-        <Badge tone="green">GST Included</Badge>
-      </div>
       <h1 id="checkout-plan-title" className="checkout-plan__name">
         {plan.name}
       </h1>

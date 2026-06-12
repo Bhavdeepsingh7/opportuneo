@@ -7,16 +7,21 @@ export interface Plan {
   messageLimit: number
 }
 
-export const GST_RATE = 18
-
 const roundToCurrency = (amount: number) => Math.round((amount + Number.EPSILON) * 100) / 100
 
-export function calculateBasePrice(totalPrice: number, gstRate: number = GST_RATE): number {
-  return roundToCurrency(totalPrice / (1 + gstRate / 100))
+/**
+ * Returns the price for display. 
+ * Since GST is removed, this is identical to the total price.
+ */
+export function calculateBasePrice(totalPrice: number): number {
+  return roundToCurrency(totalPrice)
 }
 
-export function calculateGST(totalPrice: number, gstRate: number = GST_RATE): number {
-  return roundToCurrency(totalPrice - calculateBasePrice(totalPrice, gstRate))
+/**
+ * @deprecated GST has been removed from the project.
+ */
+export function calculateGST(_totalPrice: number): number {
+  return 0
 }
 
 export function formatCurrency(

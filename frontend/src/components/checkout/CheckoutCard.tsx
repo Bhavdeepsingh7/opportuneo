@@ -1,17 +1,15 @@
 import { Card, CardContent } from '../ui/card'
 import type { Plan } from '../../lib/pricing'
-import { GST_RATE } from '../../lib/pricing'
 import { BillingSummary } from './BillingSummary'
 import { PaymentButton } from './PaymentButton'
 import { PlanDetails } from './PlanDetails'
 import { TrustSection } from './TrustSection'
 
 interface CheckoutCardProps {
-  gstRate?: number
   plan: Plan
 }
 
-export function CheckoutCard({ gstRate = GST_RATE, plan }: CheckoutCardProps) {
+export function CheckoutCard({ plan }: CheckoutCardProps) {
   return (
     <Card className="checkout-card">
       <CardContent className="checkout-card__content">
@@ -20,7 +18,7 @@ export function CheckoutCard({ gstRate = GST_RATE, plan }: CheckoutCardProps) {
         </div>
 
         <aside className="checkout-card__aside" aria-label="Billing and payment">
-          <BillingSummary plan={plan} gstRate={gstRate} />
+          <BillingSummary plan={plan} />
           <TrustSection />
           <PaymentButton plan={plan} />
         </aside>
