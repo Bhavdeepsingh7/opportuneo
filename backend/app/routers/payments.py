@@ -15,7 +15,7 @@ settings = get_settings()
 router = APIRouter(prefix="/payments", tags=["payments"])
 
 PLANS = {
-    "starter": {"name": "Starter", "amount": 49900, "credits": 1000},
+    "starter": {"name": "Starter", "amount": 100, "credits": 1000},
     "pro": {"name": "Pro", "amount": 149900, "credits": 5000},
     "agency": {"name": "Agency", "amount": 399900, "credits": 20000},
 }
