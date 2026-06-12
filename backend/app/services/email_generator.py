@@ -11,33 +11,29 @@ from app.models.schemas import ContactEntry, GeneratedEmail
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
-# LLM Selection Logic
-if settings.llm_provider == "groq":
-    client = OpenAI(
-        api_key=settings.groq_api_key,
-        base_url="https://api.groq.com/openai/v1"
-    )
-    LLM_MODEL = "llama-3.3-70b-versatile"
-elif settings.llm_provider == "gemini":
-    client = OpenAI(
-        api_key=settings.gemini_api_key,
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-    )
-    LLM_MODEL = "gemini-2.5-flash"
-else:
-    # Default to Groq if not specified
-    client = OpenAI(
-        api_key=settings.groq_api_key,
-        base_url="https://api.groq.com/openai/v1"
-    )
-    LLM_MODEL = "llama-3.3-70b-versatile"
+def get_llm_config(provider: str):
+    if provider == "groq":
+        return {
+            "client": OpenAI(api_key=settings.groq_api_key, base_url="https://api.groq.com/openai/v1"),
+            "model": "llama-3.3-70b-versatile"
+        }
+    elif provider == "gemini":
+        return {
+            "client": OpenAI(api_key=settings.gemini_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/"),
+            "model": "gemini-2.5-flash"
+        }
+    # Fallback to Groq if unknown
+    return {
+        "client": OpenAI(api_key=settings.groq_api_key, base_url="https://api.groq.com/openai/v1"),
+        "model": "llama-3.3-70b-versatile"
+    }
 
-# Gemini-specific generation code (commented out per requirement)
-# client = OpenAI(
-#     api_key=settings.gemini_api_key,
-#     base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-# )
-# LLM_MODEL = "gemini-2.5-flash"
+def should_fallback_to_groq(error: Exception) -> bool:
+    err_str = str(error).lower()
+    # 429, RESOURCE_EXHAUSTED, quota exceeded, rate limit, timeout, 5xx
+    if any(k in err_str for k in ["429", "resource_exhausted", "quota exceeded", "rate limit", "timeout", "500", "502", "503", "504"]):
+        return True
+    return False
 
 SYSTEM_PROMPT = """You are an expert career coach writing personalized job outreach emails.
 
@@ -240,6 +236,9 @@ async def _generate_single_email(
 ) -> GeneratedEmail:
     context_section = f"\nJob Context / Role Targeting: {job_context}" if job_context else ""
     last_error = None
+    
+    primary = settings.primary_llm
+    fallback = settings.fallback_llm
 
     for attempt in range(2):
         extra_guidance = ""
@@ -253,10 +252,14 @@ Important correction:
 - Mention the company name or the recipient's role explicitly.
 - Return strict JSON only.
 """
-
+        
+        provider = primary
+        config = get_llm_config(provider)
+        
         try:
-            response = client.chat.completions.create(
-                model=LLM_MODEL,
+            logger.info(f"Using {provider} provider for email generation")
+            response = config["client"].chat.completions.create(
+                model=config["model"],
                 messages=[
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {
@@ -287,14 +290,51 @@ Return JSON:
                 temperature=0.9 if attempt == 1 else 0.4, top_p=0.95,
             )
         except Exception as e:
-            logger.error(f"LLM API Failure ({settings.llm_provider}): {str(e)}")
-            if "authentication" in str(e).lower():
-                raise ValueError(f"LLM Authentication Error: Please check your {settings.llm_provider.upper()}_API_KEY")
-            if "rate limit" in str(e).lower():
-                raise ValueError("LLM Rate Limit exceeded. Please try again in a moment.")
-            if "model" in str(e).lower():
-                raise ValueError(f"Invalid model name: {LLM_MODEL}")
-            raise ValueError(f"LLM Generation failed: {str(e)}")
+            if should_fallback_to_groq(e):
+                logger.warning(f"{provider} quota exhausted or error; using {fallback} fallback. Error: {str(e)}")
+                provider = fallback
+                config = get_llm_config(provider)
+                try:
+                    logger.info(f"Using {provider} fallback provider")
+                    response = config["client"].chat.completions.create(
+                        model=config["model"],
+                        messages=[
+                            {"role": "system", "content": SYSTEM_PROMPT},
+                            {
+                                "role": "user",
+                                "content": f"""Generate a personalized outreach email.
+
+RECIPIENT:
+Name: {contact.name}
+Title: {contact.title}
+Company: {contact.company}
+Email: {contact.email}
+
+SENDER PROFILE:
+{profile}
+{context_section}
+
+TONE: {tone_instruction}
+{extra_guidance}
+
+Return JSON:
+{{
+  "subject": "compelling email subject (max 60 chars)",
+  "body": "full email body (120-180 words, with \\n\\n between paragraphs)",
+  "variant": "direct"
+}}""",
+                            },
+                        ],
+                        temperature=0.9 if attempt == 1 else 0.4, top_p=0.95,
+                    )
+                except Exception as fe:
+                    logger.error(f"Fallback {provider} also failed: {str(fe)}")
+                    raise ValueError(f"LLM Generation failed on both primary and fallback: {str(fe)}")
+            else:
+                logger.error(f"LLM API Failure ({provider}): {str(e)}")
+                if "authentication" in str(e).lower():
+                    raise ValueError(f"LLM Authentication Error: Please check your {provider.upper()}_API_KEY")
+                raise ValueError(f"LLM Generation failed: {str(e)}")
 
         text = response.choices[0].message.content.strip()
 
@@ -332,10 +372,16 @@ Summary: {resume_data.get('summary', '')}
 """.strip()
 
     feedback_section = f"\nUser feedback: {feedback}" if feedback else ""
+    
+    primary = settings.primary_llm
+    fallback = settings.fallback_llm
+    provider = primary
+    config = get_llm_config(provider)
 
     try:
-        response = client.chat.completions.create(
-            model=LLM_MODEL,
+        logger.info(f"Using {provider} provider for regeneration")
+        response = config["client"].chat.completions.create(
+            model=config["model"],
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {
@@ -358,8 +404,41 @@ Return JSON:
             temperature=0.9, top_p=0.95,
         )
     except Exception as e:
-        logger.error(f"LLM API Failure ({settings.llm_provider}): {str(e)}")
-        raise ValueError(f"Regeneration failed: {str(e)}")
+        if should_fallback_to_groq(e):
+            logger.warning(f"{provider} quota exhausted or error; using {fallback} fallback for regeneration")
+            provider = fallback
+            config = get_llm_config(provider)
+            try:
+                logger.info(f"Using {provider} fallback provider for regeneration")
+                response = config["client"].chat.completions.create(
+                    model=config["model"],
+                    messages=[
+                        {"role": "system", "content": SYSTEM_PROMPT},
+                        {
+                            "role": "user",
+                            "content": f"""Regenerate the outreach email with improvements.
+
+RECIPIENT: {contact.name} | {contact.title} @ {contact.company}
+SENDER: {profile}
+TONE: {tone_instruction}
+{feedback_section}
+
+Return JSON:
+{{
+  "subject": "compelling email subject (max 60 chars)",
+  "body": "full email body (120-180 words, with \\n\\n between paragraphs)",
+  "variant": "direct"
+}}""",
+                        },
+                    ],
+                    temperature=0.9, top_p=0.95,
+                )
+            except Exception as fe:
+                logger.error(f"Fallback {provider} also failed during regeneration: {str(fe)}")
+                raise ValueError(f"Regeneration failed on both primary and fallback: {str(fe)}")
+        else:
+            logger.error(f"LLM API Failure ({provider}) during regeneration: {str(e)}")
+            raise ValueError(f"Regeneration failed: {str(e)}")
 
     text = response.choices[0].message.content.strip()
     data = _extract_json_object(text)

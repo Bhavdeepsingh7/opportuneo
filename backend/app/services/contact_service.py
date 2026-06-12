@@ -10,32 +10,30 @@ from app.models.schemas import ContactEntry
 
 settings = get_settings()
 
-# LLM Selection Logic
-if settings.llm_provider == "groq":
-    client = OpenAI(
-        api_key=settings.groq_api_key,
-        base_url="https://api.groq.com/openai/v1"
-    )
-    LLM_MODEL = "llama-3.3-70b-versatile"
-elif settings.llm_provider == "gemini":
-    client = OpenAI(
-        api_key=settings.gemini_api_key,
-        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-    )
-    LLM_MODEL = "gemini-2.5-flash"
-else:
-    client = OpenAI(
-        api_key=settings.groq_api_key,
-        base_url="https://api.groq.com/openai/v1"
-    )
-    LLM_MODEL = "llama-3.3-70b-versatile"
+import logging
+logger = logging.getLogger(__name__)
 
-# Gemini-specific configuration (commented out per requirement)
-# client = OpenAI(
-#     api_key=settings.gemini_api_key,
-#     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-# )
-# LLM_MODEL = "gemini-2.5-flash"
+def get_llm_config(provider: str):
+    if provider == "groq":
+        return {
+            "client": OpenAI(api_key=settings.groq_api_key, base_url="https://api.groq.com/openai/v1"),
+            "model": "llama-3.3-70b-versatile"
+        }
+    elif provider == "gemini":
+        return {
+            "client": OpenAI(api_key=settings.gemini_api_key, base_url="https://generativelanguage.googleapis.com/v1beta/openai/"),
+            "model": "gemini-2.5-flash"
+        }
+    return {
+        "client": OpenAI(api_key=settings.groq_api_key, base_url="https://api.groq.com/openai/v1"),
+        "model": "llama-3.3-70b-versatile"
+    }
+
+def should_fallback_to_groq(error: Exception) -> bool:
+    err_str = str(error).lower()
+    if any(k in err_str for k in ["429", "resource_exhausted", "quota exceeded", "rate limit", "timeout", "500", "502", "503", "504"]):
+        return True
+    return False
 
 def parse_csv_contacts(file_bytes: bytes) -> List[ContactEntry]:
     text = file_bytes.decode("utf-8", errors="ignore")
@@ -75,12 +73,19 @@ async def parse_pdf_contacts_with_ai(file_bytes: bytes) -> List[ContactEntry]:
     for page in reader.pages:
         text += page.extract_text() + "\n"
 
-    response = client.chat.completions.create(
-        model=LLM_MODEL,
-        messages=[
-            {
-                "role": "user",
-                "content": f"""Extract all contact information from this document.
+    primary = settings.primary_llm
+    fallback = settings.fallback_llm
+    provider = primary
+    config = get_llm_config(provider)
+
+    try:
+        logger.info(f"Using {provider} provider for contact extraction")
+        response = config["client"].chat.completions.create(
+            model=config["model"],
+            messages=[
+                {
+                    "role": "user",
+                    "content": f"""Extract all contact information from this document.
 
 Return ONLY a raw JSON array. Do NOT include markdown code fences.
 Ensure all newlines within JSON string values are escaped as \\n.
@@ -93,16 +98,49 @@ Only include entries that have a valid email address. If no emails found, return
 
 Document text:
 {text[:5000]}"""
-            }
-        ],
-        temperature=0.2
-    )
+                }
+            ],
+            temperature=0.2
+        )
+    except Exception as e:
+        if should_fallback_to_groq(e):
+            logger.warning(f"{provider} quota exhausted or error; using {fallback} fallback for contact extraction. Error: {str(e)}")
+            provider = fallback
+            config = get_llm_config(provider)
+            try:
+                logger.info(f"Using {provider} fallback provider for contact extraction")
+                response = config["client"].chat.completions.create(
+                    model=config["model"],
+                    messages=[
+                        {
+                            "role": "user",
+                            "content": f"""Extract all contact information from this document.
+
+Return ONLY a raw JSON array. Do NOT include markdown code fences.
+Ensure all newlines within JSON string values are escaped as \\n.
+
+[
+  {{"name": "Full Name", "email": "email@company.com", "company": "Company Name", "title": "Job Title"}},
+  ...
+]
+Only include entries that have a valid email address. If no emails found, return [].
+
+Document text:
+{text[:5000]}"""
+                        }
+                    ],
+                    temperature=0.2
+                )
+            except Exception as fe:
+                logger.error(f"Fallback {provider} also failed for contact extraction: {str(fe)}")
+                raise ValueError(f"Contact extraction failed on both primary and fallback: {str(fe)}")
+        else:
+            logger.error(f"LLM API Failure ({provider}) during contact extraction: {str(e)}")
+            raise ValueError(f"Contact extraction failed: {str(e)}")
 
     text_resp = response.choices[0].message.content.strip()
 
     # Log raw response
-    import logging
-    logger = logging.getLogger(__name__)
     logger.debug(f"CONTACT_PARSE RAW RESPONSE:\n{text_resp}")
 
     # Robust cleanup
