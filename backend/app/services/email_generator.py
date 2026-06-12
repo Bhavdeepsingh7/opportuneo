@@ -53,7 +53,12 @@ Rules:
 
 NEVER use: "I'm passionate about", "I'd be a great fit", "I've always admired", "synergy", "leverage", "circle back", "touch base", "per my last email"
 
-Return ONLY valid JSON, no markdown fences."""
+OUTPUT INSTRUCTIONS:
+- Return ONLY a raw JSON object.
+- Do NOT include markdown code fences (like ```json).
+- Do NOT include any conversational text before or after the JSON.
+- Ensure all newlines within the JSON string values are properly escaped as \\n.
+"""
 
 TONE_INSTRUCTIONS = {
     "confident": "Write confidently and directly. Lead with your strongest qualification. Be assertive but not arrogant.",
@@ -63,14 +68,38 @@ TONE_INSTRUCTIONS = {
 
 
 def _extract_json_object(text: str) -> dict:
-    cleaned = text.replace("```json", "").replace("```", "").strip()
+    # 1. Basic cleaning
+    cleaned = text.strip()
+    
+    # 2. Log raw response for debugging
+    logger.debug(f"LLM RAW RESPONSE:\n{cleaned}")
+
+    # 3. Handle markdown fences
+    if cleaned.startswith("```"):
+        cleaned = re.sub(r"^```(?:json)?\n?", "", cleaned)
+        cleaned = re.sub(r"\n?```$", "", cleaned)
+    
+    cleaned = cleaned.strip()
+
     try:
-        return json.loads(cleaned)
-    except json.JSONDecodeError:
+        # 4. Attempt direct parse with strict=False to allow literal newlines in strings
+        return json.loads(cleaned, strict=False)
+    except json.JSONDecodeError as e:
+        # 5. Fallback: regex search for the first { } block
+        logger.warning(f"Initial JSON parse failed: {str(e)}. Attempting regex extraction.")
         match = re.search(r"\{.*\}", cleaned, re.DOTALL)
         if not match:
-            raise ValueError(f"Invalid JSON from model: {cleaned}")
-        return json.loads(match.group(0))
+            logger.error(f"JSON extraction failed completely. Raw text: {text}")
+            raise ValueError(f"No JSON object found in model response: {cleaned[:200]}...")
+        
+        extracted = match.group(0)
+        try:
+            return json.loads(extracted, strict=False)
+        except json.JSONDecodeError as e2:
+            logger.error(f"Regex JSON extraction failed: {str(e2)}. Raw text: {text}")
+            # Final attempt: try to fix common escaping issues? 
+            # For now, just raise clear error
+            raise ValueError(f"Invalid JSON formatting at {e2.pos}: {e2.msg}. Response: {extracted[:100]}...")
 
 
 def _normalize_body(body: str) -> str:

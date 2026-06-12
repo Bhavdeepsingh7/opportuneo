@@ -81,7 +81,10 @@ async def parse_pdf_contacts_with_ai(file_bytes: bytes) -> List[ContactEntry]:
             {
                 "role": "user",
                 "content": f"""Extract all contact information from this document.
-Return ONLY a valid JSON array, no markdown:
+
+Return ONLY a raw JSON array. Do NOT include markdown code fences.
+Ensure all newlines within JSON string values are escaped as \\n.
+
 [
   {{"name": "Full Name", "email": "email@company.com", "company": "Company Name", "title": "Job Title"}},
   ...
@@ -96,12 +99,31 @@ Document text:
     )
 
     text_resp = response.choices[0].message.content.strip()
-    text_resp = text_resp.replace("```json", "").replace("```", "").strip()
+
+    # Log raw response
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.debug(f"CONTACT_PARSE RAW RESPONSE:\n{text_resp}")
+
+    # Robust cleanup
+    cleaned = text_resp.strip()
+    if cleaned.startswith("```"):
+        import re
+        cleaned = re.sub(r"^```(?:json)?\n?", "", cleaned)
+        cleaned = re.sub(r"\n?```$", "", cleaned)
+    cleaned = cleaned.strip()
 
     try:
-        data = json.loads(text_resp)
+        data = json.loads(cleaned, strict=False)
     except json.JSONDecodeError:
-        raise ValueError(f"Invalid JSON from model: {text_resp}")
+        import re
+        # Look for [ ] array block
+        match = re.search(r"\[.*\]", cleaned, re.DOTALL)
+        if match:
+            data = json.loads(match.group(0), strict=False)
+        else:
+            logger.error(f"Failed to parse contact JSON. Raw: {text_resp}")
+            raise ValueError(f"Invalid JSON from model: {cleaned[:100]}...")
 
     return [
         ContactEntry(**item)

@@ -61,7 +61,10 @@ async def parse_resume_with_ai(raw_text: str) -> dict:
             {
                 "role": "user",
                 "content": f"""Extract structured professional profile from this resume.
-Return ONLY valid JSON, no markdown fences, no explanation:
+
+Return ONLY a raw JSON object. Do NOT include markdown code fences, do NOT include any explanation.
+Ensure all newlines within JSON string values are escaped as \\n.
+
 {{
   "name": "Full Name",
   "current_title": "Most recent job title",
@@ -83,7 +86,25 @@ Resume text:
 
     text = response.choices[0].message.content.strip()
 
-    # cleanup (Gemini sometimes still wraps JSON)
-    text = text.replace("```json", "").replace("```", "").strip()
+    # Log raw response
+    import logging
+    logger = logging.getLogger(__name__)
+    logger.debug(f"RESUME_PARSE RAW RESPONSE:\n{text}")
 
-    return json.loads(text)
+    # Robust cleanup
+    cleaned = text.strip()
+    if cleaned.startswith("```"):
+        import re
+        cleaned = re.sub(r"^```(?:json)?\n?", "", cleaned)
+        cleaned = re.sub(r"\n?```$", "", cleaned)
+    cleaned = cleaned.strip()
+
+    try:
+        return json.loads(cleaned, strict=False)
+    except json.JSONDecodeError:
+        import re
+        match = re.search(r"\{.*\}", cleaned, re.DOTALL)
+        if match:
+            return json.loads(match.group(0), strict=False)
+        logger.error(f"Failed to parse resume JSON. Raw: {text}")
+        raise
