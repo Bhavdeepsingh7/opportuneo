@@ -54,7 +54,7 @@ async def parse_pdf_contacts_with_ai(file_bytes: bytes) -> List[ContactEntry]:
         text += page.extract_text() + "\n"
 
     response = client.chat.completions.create(
-        model="gemini-flash-latest",
+        model="gemini-2.5-flash",
         messages=[
             {
                 "role": "user",

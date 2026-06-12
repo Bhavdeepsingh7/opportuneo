@@ -34,7 +34,7 @@ def extract_resume_text(file_bytes: bytes, content_type: str) -> str:
 
 async def parse_resume_with_ai(raw_text: str) -> dict:
     response = client.chat.completions.create(
-        model="gemini-flash-latest",
+        model="gemini-2.5-flash",
         messages=[
             {
                 "role": "user",

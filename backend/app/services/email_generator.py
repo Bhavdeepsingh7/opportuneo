@@ -203,7 +203,7 @@ Important correction:
 """
 
         response = client.chat.completions.create(
-            model="gemini-flash-latest",
+            model="gemini-2.5-flash",
             messages=[
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {
@@ -272,7 +272,7 @@ Summary: {resume_data.get('summary', '')}
     feedback_section = f"\nUser feedback: {feedback}" if feedback else ""
 
     response = client.chat.completions.create(
-        model="gemini-flash-latest",
+        model="gemini-2.5-flash",
         messages=[
             {"role": "system", "content": SYSTEM_PROMPT},
             {
