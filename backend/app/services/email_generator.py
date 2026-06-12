@@ -284,7 +284,7 @@ Return JSON:
 }}""",
                     },
                 ],
-                temperature=0.6 if attempt == 1 else 0.4,
+                temperature=0.9 if attempt == 1 else 0.4, top_p=0.95,
             )
         except Exception as e:
             logger.error(f"LLM API Failure ({settings.llm_provider}): {str(e)}")
@@ -355,7 +355,7 @@ Return JSON:
 }}""",
                 },
             ],
-            temperature=0.5,
+            temperature=0.9, top_p=0.95,
         )
     except Exception as e:
         logger.error(f"LLM API Failure ({settings.llm_provider}): {str(e)}")
