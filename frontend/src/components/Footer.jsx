@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import logo from '../assets/logo.png'
 import './Footer.css'
 
 const footerLinks = [
@@ -12,8 +13,8 @@ export default function Footer() {
   return (
     <footer className="site-footer">
       <div className="site-footer-inner">
-        <Link to="/" className="site-footer-brand" aria-label="opportuneo home">
-          <span className="site-footer-mark">op</span>
+        <Link to="/" className="site-footer-brand" aria-label="Opportuneo home">
+          <img src={logo} alt="" style={{ height: '20px' }} />
           <span>opportuneo</span>
         </Link>
 
@@ -32,7 +33,7 @@ export default function Footer() {
         </nav>
 
         <p className="site-footer-copy">
-          &copy; opportuneo. All rights reserved.
+          &copy; Opportuneo. All rights reserved.
         </p>
       </div>
     </footer>

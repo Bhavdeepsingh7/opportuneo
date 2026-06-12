@@ -3,6 +3,7 @@ import { Outlet, useNavigate, NavLink } from 'react-router-dom'
 import { useAuth } from '../context/AuthContext'
 import { useAppState } from '../context/AppContext'
 import { LayoutDashboard, Settings, LogOut, DollarSign, Coins, Zap } from 'lucide-react'
+import logo from '../assets/logo.png'
 import Footer from '../components/Footer'
 import './AppShell.css'
 
@@ -37,7 +38,7 @@ export default function AppShell() {
       <aside className="sidebar">
         <div className="sidebar-top">
           <button className="sidebar-logo" onClick={() => navigate('/app/dashboard')}>
-            <span className="logo-glow">op</span>
+            <img src={logo} alt="" style={{ height: '28px' }} />
             <span className="logo-label">opportuneo</span>
           </button>
 

@@ -1,4 +1,5 @@
 import { Link } from 'react-router-dom'
+import logo from '../../assets/logo.png'
 import Footer from '../../components/Footer'
 import { legalPages } from './legalContent'
 import './LegalPage.css'
@@ -11,7 +12,7 @@ export default function LegalPage({ type }) {
       <header className="legal-hero">
         <div className="legal-shell">
           <Link to="/" className="legal-brand">
-            <span className="legal-brand-mark">op</span>
+            <img src={logo} alt="" style={{ height: '24px' }} />
             <span>opportuneo</span>
           </Link>
           <div className="legal-hero-copy">

@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { useNavigate, useLocation } from 'react-router-dom'
 import { Zap, LayoutDashboard, Settings, LogOut, Menu, X, ChevronRight, DollarSign } from 'lucide-react'
+import logo from '../assets/logo.png'
 import { useAuth } from '../context/AuthContext'
 import { useAppState } from '../context/AppContext'
 import './AppShell.css'
@@ -30,7 +31,7 @@ export default function AppShell({ children }) {
       {/* Sidebar */}
       <aside className={`sidebar ${mobileOpen ? 'mobile-open' : ''}`}>
         <div className="sidebar-logo" onClick={() => navigate('/app/dashboard')}>
-          <span className="logo-bolt">op</span>
+          <img src={logo} alt="" style={{ height: '28px' }} />
           <span className="logo-name">opportuneo</span>
         </div>
 
@@ -79,7 +80,10 @@ export default function AppShell({ children }) {
           <button className="btn btn-ghost btn-icon" onClick={() => setMobileOpen(true)}>
             <Menu size={20} />
           </button>
-          <span className="logo-name" style={{ fontFamily: 'var(--font-head)', fontWeight: 900 }}>opportuneo</span>
+          <div className="flex items-center gap-2">
+            <img src={logo} alt="" style={{ height: '24px' }} />
+            <span className="logo-name" style={{ fontFamily: 'var(--font-head)', fontWeight: 900 }}>opportuneo</span>
+          </div>
           <div style={{ width: 36 }} />
         </header>
 

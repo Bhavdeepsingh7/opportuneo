@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useNavigate, useSearchParams } from 'react-router-dom'
 import { Mail, Lock, Eye, EyeOff, Zap, AlertCircle, CheckCircle2 } from 'lucide-react'
 import { useAuth } from '../context/AuthContext'
+import logo from '../assets/logo.png'
 import Footer from '../components/Footer'
 import './AuthPage.css'
 
@@ -58,7 +59,7 @@ export default function AuthPage() {
 
       <div className="auth-card card fade-up">
         <div className="auth-logo">
-          <span className="auth-logo-icon">op</span>
+          <img src={logo} alt="" style={{ height: '36px' }} />
           <span className="auth-logo-text">opportuneo</span>
         </div>
 

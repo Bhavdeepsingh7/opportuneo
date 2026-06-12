@@ -1,5 +1,6 @@
 import { Link } from 'react-router-dom'
 import { ArrowRight, CheckCircle2, Coins, MailCheck, ShieldCheck, Sparkles, UploadCloud } from 'lucide-react'
+import logo from '../assets/logo.png'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.png'
 import './LandingPage.css'
@@ -39,8 +40,8 @@ export default function LandingPage() {
   return (
     <main className="landing-page">
       <header className="landing-nav">
-        <Link to="/" className="landing-brand" aria-label="opportuneo home">
-          <span>op</span>
+        <Link to="/" className="landing-brand" aria-label="Opportuneo home">
+          <img src={logo} alt="" style={{ height: '32px' }} />
           <strong>opportuneo</strong>
         </Link>
         <nav aria-label="Primary navigation">
@@ -59,7 +60,7 @@ export default function LandingPage() {
           </div>
           <h1>Turn job opportunities into warm conversations.</h1>
           <p>
-            opportuneo helps job seekers, career coaches, and placement teams generate resume-aware outreach emails for recruiters, hiring managers, and referral contacts.
+            Opportuneo helps job seekers, career coaches, and placement teams generate resume-aware outreach emails for recruiters, hiring managers, and referral contacts.
           </p>
           <div className="landing-actions">
             <Link to="/auth?mode=signup" className="landing-button landing-button--primary">
@@ -72,7 +73,7 @@ export default function LandingPage() {
           </div>
         </div>
 
-        <div className="landing-visual" aria-label="opportuneo product preview">
+        <div className="landing-visual" aria-label="Opportuneo product preview">
           <img src={heroImage} alt="" />
           <div className="landing-preview">
             <div className="landing-preview__top">
@@ -114,7 +115,7 @@ export default function LandingPage() {
       <section className="landing-workflow">
         <div>
           <h2>From resume to outreach in minutes.</h2>
-          <p>opportuneo keeps the workflow practical: bring your resume, contacts, and job target, then review the generated emails before sending.</p>
+          <p>Opportuneo keeps the workflow practical: bring your resume, contacts, and job target, then review the generated emails before sending.</p>
         </div>
         <ol>
           {steps.map((step) => (

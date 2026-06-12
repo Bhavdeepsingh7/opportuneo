@@ -72,7 +72,7 @@ export async function handlePayment(plan: Plan): Promise<PaymentResult> {
       amount: order.amount,
       currency: order.currency,
       order_id: order.order_id,
-      name: 'opportuneo',
+      name: 'Opportuneo',
       description: `${plan.name} - ${plan.description}`,
       prefill: {
         name: session.user.user_metadata?.full_name || '',
