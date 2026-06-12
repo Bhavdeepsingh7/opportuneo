@@ -11,10 +11,33 @@ from app.models.schemas import ContactEntry, GeneratedEmail
 settings = get_settings()
 logger = logging.getLogger(__name__)
 
-client = OpenAI(
-    api_key=settings.gemini_api_key,
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
-)
+# LLM Selection Logic
+if settings.llm_provider == "groq":
+    client = OpenAI(
+        api_key=settings.groq_api_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
+    LLM_MODEL = "llama-3.3-70b-versatile"
+elif settings.llm_provider == "gemini":
+    client = OpenAI(
+        api_key=settings.gemini_api_key,
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+    )
+    LLM_MODEL = "gemini-2.5-flash"
+else:
+    # Default to Groq if not specified
+    client = OpenAI(
+        api_key=settings.groq_api_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
+    LLM_MODEL = "llama-3.3-70b-versatile"
+
+# Gemini-specific generation code (commented out per requirement)
+# client = OpenAI(
+#     api_key=settings.gemini_api_key,
+#     base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+# )
+# LLM_MODEL = "gemini-2.5-flash"
 
 SYSTEM_PROMPT = """You are an expert career coach writing personalized job outreach emails.
 
@@ -202,13 +225,14 @@ Important correction:
 - Return strict JSON only.
 """
 
-        response = client.chat.completions.create(
-            model="gemini-2.5-flash",
-            messages=[
-                {"role": "system", "content": SYSTEM_PROMPT},
-                {
-                    "role": "user",
-                    "content": f"""Generate a personalized outreach email.
+        try:
+            response = client.chat.completions.create(
+                model=LLM_MODEL,
+                messages=[
+                    {"role": "system", "content": SYSTEM_PROMPT},
+                    {
+                        "role": "user",
+                        "content": f"""Generate a personalized outreach email.
 
 RECIPIENT:
 Name: {contact.name}
@@ -229,10 +253,19 @@ Return JSON:
   "body": "full email body (120-180 words, with \\n\\n between paragraphs)",
   "variant": "direct"
 }}""",
-                },
-            ],
-            temperature=0.6 if attempt == 1 else 0.4,
-        )
+                    },
+                ],
+                temperature=0.6 if attempt == 1 else 0.4,
+            )
+        except Exception as e:
+            logger.error(f"LLM API Failure ({settings.llm_provider}): {str(e)}")
+            if "authentication" in str(e).lower():
+                raise ValueError(f"LLM Authentication Error: Please check your {settings.llm_provider.upper()}_API_KEY")
+            if "rate limit" in str(e).lower():
+                raise ValueError("LLM Rate Limit exceeded. Please try again in a moment.")
+            if "model" in str(e).lower():
+                raise ValueError(f"Invalid model name: {LLM_MODEL}")
+            raise ValueError(f"LLM Generation failed: {str(e)}")
 
         text = response.choices[0].message.content.strip()
 
@@ -271,13 +304,14 @@ Summary: {resume_data.get('summary', '')}
 
     feedback_section = f"\nUser feedback: {feedback}" if feedback else ""
 
-    response = client.chat.completions.create(
-        model="gemini-2.5-flash",
-        messages=[
-            {"role": "system", "content": SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": f"""Regenerate the outreach email with improvements.
+    try:
+        response = client.chat.completions.create(
+            model=LLM_MODEL,
+            messages=[
+                {"role": "system", "content": SYSTEM_PROMPT},
+                {
+                    "role": "user",
+                    "content": f"""Regenerate the outreach email with improvements.
 
 RECIPIENT: {contact.name} | {contact.title} @ {contact.company}
 SENDER: {profile}
@@ -290,10 +324,13 @@ Return JSON:
   "body": "full email body (120-180 words, with \\n\\n between paragraphs)",
   "variant": "direct"
 }}""",
-            },
-        ],
-        temperature=0.5,
-    )
+                },
+            ],
+            temperature=0.5,
+        )
+    except Exception as e:
+        logger.error(f"LLM API Failure ({settings.llm_provider}): {str(e)}")
+        raise ValueError(f"Regeneration failed: {str(e)}")
 
     text = response.choices[0].message.content.strip()
     data = _extract_json_object(text)

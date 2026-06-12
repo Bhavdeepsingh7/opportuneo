@@ -7,6 +7,8 @@ load_dotenv()
 class Settings:
     anthropic_api_key: str = os.getenv("ANTHROPIC_API_KEY", "")
     gemini_api_key: str = os.getenv("GEMINI_API_KEY", "")
+    groq_api_key: str = os.getenv("GROQ_API_KEY", "")
+    llm_provider: str = os.getenv("LLM_PROVIDER", "groq")  # 'groq' or 'gemini'
     supabase_url: str = os.getenv("SUPABASE_URL", "")
     supabase_service_role_key: str = os.getenv("SUPABASE_SERVICE_ROLE_KEY", "")
     razorpay_key_id: str = os.getenv("RAZORPAY_KEY_ID", "")

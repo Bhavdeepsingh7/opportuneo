@@ -10,10 +10,32 @@ from app.models.schemas import ContactEntry
 
 settings = get_settings()
 
-client = OpenAI(
-    api_key=settings.gemini_api_key,
-    base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
-)
+# LLM Selection Logic
+if settings.llm_provider == "groq":
+    client = OpenAI(
+        api_key=settings.groq_api_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
+    LLM_MODEL = "llama-3.3-70b-versatile"
+elif settings.llm_provider == "gemini":
+    client = OpenAI(
+        api_key=settings.gemini_api_key,
+        base_url="https://generativelanguage.googleapis.com/v1beta/openai/",
+    )
+    LLM_MODEL = "gemini-2.5-flash"
+else:
+    client = OpenAI(
+        api_key=settings.groq_api_key,
+        base_url="https://api.groq.com/openai/v1"
+    )
+    LLM_MODEL = "llama-3.3-70b-versatile"
+
+# Gemini-specific configuration (commented out per requirement)
+# client = OpenAI(
+#     api_key=settings.gemini_api_key,
+#     base_url="https://generativelanguage.googleapis.com/v1beta/openai/"
+# )
+# LLM_MODEL = "gemini-2.5-flash"
 
 def parse_csv_contacts(file_bytes: bytes) -> List[ContactEntry]:
     text = file_bytes.decode("utf-8", errors="ignore")
@@ -54,7 +76,7 @@ async def parse_pdf_contacts_with_ai(file_bytes: bytes) -> List[ContactEntry]:
         text += page.extract_text() + "\n"
 
     response = client.chat.completions.create(
-        model="gemini-2.5-flash",
+        model=LLM_MODEL,
         messages=[
             {
                 "role": "user",
