@@ -38,6 +38,7 @@ async def _generate_emails(job: dict[str, Any]) -> list[dict[str, Any]]:
 
 
 async def _process_job(job: dict[str, Any]) -> list[dict[str, Any]]:
+    logger.info(f"WORKER_PROCESS_JOB: resume_file_path={job.get('resume_file_path')}")
     emails = job.get("emails") or await _generate_emails(job)
     results = await send_emails_via_gmail(
         token_data=job["token_data"],

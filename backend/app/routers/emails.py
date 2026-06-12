@@ -115,6 +115,8 @@ async def regenerate_email(req: RegenerateRequest, user: dict = Depends(get_curr
 @router.post("/send")
 async def send_emails(req: SendRequest):
     """Queue reviewed emails for asynchronous delivery through Gmail."""
+    import logging
+    logging.info(f"SEND_EMAILS_REQUEST: resume_file_path={req.resume_file_path}")
     if not req.emails:
         raise HTTPException(status_code=400, detail="No emails to send")
     if not req.token_data:

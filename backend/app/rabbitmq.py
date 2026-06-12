@@ -51,6 +51,7 @@ async def publish_job(
     queue_name: str | None = None,
     headers: dict[str, Any] | None = None,
 ) -> None:
+    logger.info(f"RABBITMQ_PUBLISH_JOB: resume_file_path={job.get('resume_file_path')}")
     channel = await get_channel()
     await channel.default_exchange.publish(
         aio_pika.Message(

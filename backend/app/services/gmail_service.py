@@ -149,6 +149,7 @@ async def send_emails_via_gmail(
     resume_file_path: Optional[str] = None,
 ) -> List[EmailSendResult]:
     """Send emails using the user's Gmail via OAuth tokens."""
+    logger.info(f"GMAIL_SERVICE_SEND: resume_file_path={resume_file_path}")
     creds = _build_creds(token_data)
     service = build("gmail", "v1", credentials=creds)
     results = []

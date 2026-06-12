@@ -28,6 +28,9 @@ async def get_default_resume(user: dict = Depends(get_current_user)):
     if res.status_code != 200:
         return None
     data = res.json()
+    if data:
+        import logging
+        logging.info(f"GET_DEFAULT_RESUME: storage_path={data[0].get('storage_path')}")
     return data[0] if data else None
 
 @router.post("/upload-default")
@@ -46,6 +49,8 @@ async def upload_default_resume(
     # 1. Upload to Supabase Storage
     safe_filename = f"{uuid.uuid4()}_{file.filename}"
     storage_path = f"{user['id']}/{safe_filename}"
+    import logging
+    logging.info(f"UPLOAD_DEFAULT_RESUME: storage_path={storage_path}")
     try:
         await storage_service.upload_file(
             bucket=STORAGE_BUCKET,
@@ -139,6 +144,8 @@ async def parse_resume(
         # Safe filename & upload to Supabase
         safe_filename = f"{uuid.uuid4()}_{file.filename}"
         storage_path = f"uploads/{safe_filename}"
+        import logging
+        logging.info(f"PARSE_RESUME: storage_path={storage_path}")
         
         try:
             await storage_service.upload_file(
