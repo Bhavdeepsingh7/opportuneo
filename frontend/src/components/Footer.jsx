@@ -6,6 +6,7 @@ const footerLinks = [
   { to: '/privacy-policy', label: 'Privacy Policy' },
   { to: '/terms-and-conditions', label: 'Terms & Conditions' },
   { to: '/refund-and-cancellation-policy', label: 'Refund & Cancellation Policy' },
+  { to: '/compliance', label: 'Compliance Policy' },
   { to: 'mailto:[Business Email]', label: 'Contact Us', external: true },
 ]
 

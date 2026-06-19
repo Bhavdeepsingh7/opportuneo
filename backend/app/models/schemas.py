@@ -24,6 +24,7 @@ class GenerateEmailsRequest(BaseModel):
     job_context: Optional[str] = ""
     tone: str = "confident"  # confident | warm | humble
     user_id: str
+    consent_confirmed: bool = False
 
 class GeneratedEmail(BaseModel):
     contact: ContactEntry
@@ -36,6 +37,7 @@ class SendEmailRequest(BaseModel):
     from_email: str  # must be verified in Resend
     emails: List[dict]  # [{to, subject, body}]
     user_id: str
+    consent_confirmed: bool = False
 
 class EmailSendResult(BaseModel):
     email: str

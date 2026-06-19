@@ -8,6 +8,7 @@ from app.rabbitmq import publish_job
 from app.services.campaign_service import update_campaign_status
 from app.dependencies import get_current_user, get_supabase_headers
 from app.config import get_settings
+from app.services.audit_service import create_audit_log, get_daily_send_volume
 
 settings = get_settings()
 router = APIRouter(prefix="/emails", tags=["emails"])
@@ -17,6 +18,7 @@ class GenerateRequest(BaseModel):
     contacts: List[ContactEntry]
     job_context: str = ""
     tone: str = "confident"
+    consent_confirmed: bool = False
 
 class RegenerateRequest(BaseModel):
     resume_data: dict
@@ -32,6 +34,7 @@ class SendRequest(BaseModel):
     emails: List[dict]        # [{to, subject, body, contact_name}]
     resume_file_path: str | None = None
     campaign_id: str | None = None
+    consent_confirmed: bool = False
 
 async def _call_rpc(name: str, params: dict):
     async with httpx.AsyncClient(timeout=15) as client:
@@ -45,8 +48,12 @@ async def _call_rpc(name: str, params: dict):
 @router.post("/generate")
 async def generate_emails(req: GenerateRequest, user: dict = Depends(get_current_user)):
     """Generate personalized emails for all contacts. Consumes 1 credit per email."""
+    if not req.consent_confirmed:
+        raise HTTPException(status_code=400, detail="Consent confirmation is required.")
     if not req.contacts:
         raise HTTPException(status_code=400, detail="No contacts provided")
+    if len(req.contacts) > 10:
+        raise HTTPException(status_code=400, detail="Maximum 10 recipients allowed per email generation action.")
     if not req.resume_data:
         raise HTTPException(status_code=400, detail="No resume data provided")
 
@@ -68,6 +75,20 @@ async def generate_emails(req: GenerateRequest, user: dict = Depends(get_current
     remaining_credits = res.json()
 
     try:
+        # Create consent acknowledgment log
+        await create_audit_log(
+            user_id=user_id,
+            action="consent_acknowledged",
+            metadata={"type": "email_generation", "count": count}
+        )
+
+        # Create email generation log
+        await create_audit_log(
+            user_id=user_id,
+            action="emails_generated",
+            metadata={"count": count, "tone": req.tone}
+        )
+
         emails = await generate_emails_for_contacts(
             resume_data=req.resume_data,
             contacts=req.contacts,
@@ -113,16 +134,46 @@ async def regenerate_email(req: RegenerateRequest, user: dict = Depends(get_curr
         raise HTTPException(status_code=500, detail=f"Regeneration failed: {str(e)}")
 
 @router.post("/send")
-async def send_emails(req: SendRequest):
+async def send_emails(req: SendRequest, user: dict = Depends(get_current_user)):
     """Queue reviewed emails for asynchronous delivery through Gmail."""
     import logging
-    logging.info(f"SEND_EMAILS_REQUEST: resume_file_path={req.resume_file_path}")
+    logging.info(f"SEND_EMAILS_REQUEST: user_id={user['id']} resume_file_path={req.resume_file_path}")
+    if not req.consent_confirmed:
+        raise HTTPException(status_code=400, detail="Consent confirmation is required.")
     if not req.emails:
         raise HTTPException(status_code=400, detail="No emails to send")
+    if len(req.emails) > 10:
+        raise HTTPException(status_code=400, detail="Maximum 10 recipients allowed per email sending action.")
     if not req.token_data:
         raise HTTPException(status_code=401, detail="Gmail not connected")
 
+    user_id = user["id"]
+    to_send = len(req.emails)
+
+    # Check daily sending limit (100 emails / day / user)
+    sent_today = await get_daily_send_volume(user_id)
+    if sent_today + to_send > 100:
+        raise HTTPException(
+            status_code=400,
+            detail=f"Daily send limit exceeded. You have sent {sent_today} emails in the last 24 hours. "
+                   f"Maximum daily limit is 100 emails. Sending {to_send} more would exceed this limit."
+        )
+
     try:
+        # Create consent acknowledgment log
+        await create_audit_log(
+            user_id=user_id,
+            action="consent_acknowledged",
+            metadata={"type": "email_sending", "count": to_send}
+        )
+
+        # Create email sending log
+        await create_audit_log(
+            user_id=user_id,
+            action="emails_sent",
+            metadata={"count": to_send}
+        )
+
         await publish_job(
             {
                 "campaign_id": req.campaign_id,

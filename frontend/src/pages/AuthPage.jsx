@@ -68,8 +68,8 @@ export default function AuthPage() {
         </h1>
         <p className="auth-subtitle">
           {mode === 'login'
-            ? 'Sign in to continue generating personalized outreach emails'
-            : 'Start sending AI-personalized emails to HRs and employers'}
+            ? 'Sign in to continue generating personalized emails'
+            : 'Start sending AI-personalized emails to consented recipients'}
         </p>
 
         {/* Google */}

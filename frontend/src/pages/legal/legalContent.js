@@ -10,7 +10,7 @@ export const legalPages = {
       {
         title: '1. Information We Collect',
         body: [
-          'Opportuneo is an AI job outreach SaaS platform that helps users generate personalized emails, manage campaigns, and reach recruiters or hiring teams. To provide the Service, we may collect information you provide directly, information generated through your use of the Service, and information from connected third-party services.',
+          'Opportuneo is an AI email assistant SaaS platform that helps users generate personalized emails, manage campaigns, and connect with their recipients. To provide the Service, we may collect information you provide directly, information generated through your use of the Service, and information from connected third-party services.',
           'This may include account details, workspace information, uploaded contacts, campaign content, message drafts, response data, usage logs, device data, and support communications.',
         ],
       },
@@ -22,10 +22,10 @@ export const legalPages = {
         ],
       },
       {
-        title: '3. Outreach, Campaign, and AI Data',
+        title: '3. Communication, Campaign, and AI Data',
         body: [
-          'You may upload or enter contact lists, lead information, resumes, company details, prompts, campaign instructions, message templates, generated messages, and response history. We use this information to generate personalized outreach, operate campaign workflows, improve reliability, and provide analytics within your account.',
-          'You are responsible for ensuring that the contacts, leads, and other personal data you upload or process through the Service have been collected and used in compliance with applicable laws.',
+          'You may upload or enter contact lists, consented recipient details, resumes, company details, prompts, campaign instructions, message templates, generated messages, and response history. We use this information to generate personalized emails, operate campaign workflows, improve reliability, and provide analytics within your account.',
+          'You are responsible for ensuring that the contacts and other personal data you upload or process through the Service have been collected and used in compliance with applicable laws, including obtaining explicit opt-in consent.',
         ],
       },
       {
@@ -51,7 +51,7 @@ export const legalPages = {
       {
         title: '7. How We Use Information',
         body: [
-          'We use information to provide, secure, maintain, and improve the Service; generate AI-assisted outreach; manage subscriptions; send transactional notices; provide customer support; prevent abuse; analyze usage; comply with legal obligations; and enforce our agreements.',
+          'We use information to provide, secure, maintain, and improve the Service; generate AI-assisted personalized emails; manage subscriptions; send transactional notices; provide customer support; prevent abuse; analyze usage; comply with legal obligations; and enforce our agreements.',
         ],
       },
       {
@@ -94,7 +94,7 @@ export const legalPages = {
     title: 'Terms & Conditions',
     eyebrow: 'Legal',
     description:
-      'These Terms & Conditions govern your access to and use of Opportuneo, an AI job outreach SaaS platform operated by Opportuneo.',
+      'These Terms & Conditions govern your access to and use of Opportuneo, an AI email assistant SaaS platform operated by Opportuneo.',
     updated: '11-06-2026',
     sections: [
       {
@@ -153,8 +153,8 @@ export const legalPages = {
       {
         title: '8. AI-Generated Content',
         body: [
-          'AI-generated messages may be inaccurate, incomplete, repetitive, or unsuitable for a particular recipient or jurisdiction. You are responsible for reviewing, editing, approving, and sending all outreach content.',
-          'We do not guarantee that AI-generated content will produce any particular response rate, revenue outcome, hiring result, or business result.',
+          'AI-generated messages may be inaccurate, incomplete, repetitive, or unsuitable for a particular recipient or jurisdiction. You are responsible for reviewing, editing, approving, and sending all email content.',
+          'We do not guarantee that AI-generated content will produce any particular response rate, reply rate, or email delivery rate.',
         ],
       },
       {
@@ -260,6 +260,37 @@ export const legalPages = {
         title: '8. Contact Information',
         body: [
           'Billing questions, cancellation requests, and refund requests can be sent to Bhavdeepmakkar@gmail.com. You may also contact Opportuneo at https://www.opportuneo.in/. Website: https://www.opportuneo.in/.',
+        ],
+      },
+    ],
+  },
+  compliance: {
+    path: '/compliance',
+    title: 'Compliance Policy',
+    eyebrow: 'Legal',
+    description:
+      'Learn about Opportuneo\'s compliance requirements, acceptable use policies, and guidelines for Gmail API usage.',
+    updated: '19-06-2026',
+    sections: [
+      {
+        title: 'Acceptable Use',
+        body: [
+          'Opportuneo is a consent-based AI email assistant. Users may only send emails to recipients who have explicitly consented to receive communications from them.',
+        ],
+      },
+      {
+        title: 'Prohibited Activities',
+        list: [
+          'Spam and sending unsolicited commercial emails.',
+          'Using purchased, rented, or third-party contact lists.',
+          'Automated bulk outreach and mass cold-email campaigns.',
+          'Sending automated, triggered, or scheduled background emails without manual review.',
+        ],
+      },
+      {
+        title: 'Gmail Compliance',
+        body: [
+          'Opportuneo follows the Google Workspace API User Data Policy and Gmail API requirements. We implement safeguards to protect API usage and maintain high sender reputation, including mandatory manual email reviews, mandatory consent checks, and strict sending limits.',
         ],
       },
     ],

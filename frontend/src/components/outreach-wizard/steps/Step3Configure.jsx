@@ -17,14 +17,15 @@ export default function Step3Configure({ data, setData, nextStep, prevStep }) {
   const { availableCredits, setAvailableCredits } = useAppState()
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [consentConfirmed, setConsentConfirmed] = useState(false)
 
   const contactCount = Array.isArray(data.contacts) ? data.contacts.length : 0
 
   const canGenerate = useMemo(() => {
     const hasResume = !!(data.resumeData && Object.keys(data.resumeData).length)
     const hasContacts = contactCount > 0
-    return hasResume && hasContacts && !loading
-  }, [contactCount, data.resumeData, loading])
+    return hasResume && hasContacts && !loading && consentConfirmed
+  }, [contactCount, data.resumeData, loading, consentConfirmed])
 
   const handleGenerate = async () => {
     setError('')
@@ -43,6 +44,7 @@ export default function Step3Configure({ data, setData, nextStep, prevStep }) {
         contacts: data.contacts,
         job_context: data.jobContext,
         tone: data.tone,
+        consent_confirmed: true,
       }, session?.access_token)
       
       setData({ generatedEmails: res.data.emails })
@@ -65,9 +67,9 @@ export default function Step3Configure({ data, setData, nextStep, prevStep }) {
   return (
     <div className="oa-step oa-step3 space-y-6">
       <div>
-        <h2 className="text-xl font-semibold text-[var(--text)]">Configure outreach</h2>
+        <h2 className="text-xl font-semibold text-[var(--text)]">Configure campaign</h2>
         <p className="mt-1 text-sm text-[var(--text2)]">
-          Add job context and choose a tone. Then we’ll generate emails for each contact.
+          Add target context and choose a tone. Then we’ll generate emails for each contact.
         </p>
       </div>
 
@@ -137,6 +139,20 @@ export default function Step3Configure({ data, setData, nextStep, prevStep }) {
             )
           })}
         </div>
+      </div>
+
+      {/* Required Consent Checkbox */}
+      <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg3)] p-3">
+        <input
+          id="generate-consent"
+          type="checkbox"
+          checked={consentConfirmed}
+          onChange={(e) => setConsentConfirmed(e.target.checked)}
+          className="h-4 w-4 rounded border-[var(--border2)] bg-[var(--bg2)] text-[var(--accent)] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        />
+        <label htmlFor="generate-consent" className="text-xs text-[var(--text2)] font-semibold select-none cursor-pointer">
+          I confirm that all recipients have explicitly consented to receive communications from me.
+        </label>
       </div>
 
       {error && (

@@ -68,7 +68,7 @@ def plain_to_html(text: str, sender_name: str) -> str:
     {html_paragraphs}
   </div>
   <p style="text-align:center;color:#9ca3af;font-size:12px;margin-top:24px;">
-    Sent via OutreachAI
+    Sent via Opportuneo
   </p>
 </body>
 </html>

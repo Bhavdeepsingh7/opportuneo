@@ -30,6 +30,7 @@ export default function App() {
             <Route path="/privacy-policy" element={<LegalPage type="privacy" />} />
             <Route path="/terms-and-conditions" element={<LegalPage type="terms" />} />
             <Route path="/refund-and-cancellation-policy" element={<LegalPage type="refund" />} />
+            <Route path="/compliance" element={<LegalPage type="compliance" />} />
             <Route path="/app" element={<AppShell />}>
               <Route index element={<Navigate to="/app/dashboard" replace />} />
               <Route path="dashboard"  element={<Dashboard />} />

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useState } from 'react'
 import { AlertCircle, CheckCircle2, RefreshCw, Send, XCircle } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { getGmailAuthUrl, getGmailTokens, sendEmails, verifyGmailToken } from '../../../lib/api'
+import { supabase } from '../../../lib/supabase'
 import './Step5Send.css'
 
 export default function Step5Send({ data, setData, prevStep }) {
@@ -13,9 +14,11 @@ export default function Step5Send({ data, setData, prevStep }) {
   const [sending, setSending] = useState(false)
   const [results, setResults] = useState(null)
 
+  const [consentConfirmed, setConsentConfirmed] = useState(false)
+
   const canSend = useMemo(() => {
-    return !!data.gmailTokens && emails.length > 0 && !sending
-  }, [data.gmailTokens, emails.length, sending])
+    return !!data.gmailTokens && emails.length > 0 && !sending && consentConfirmed
+  }, [data.gmailTokens, emails.length, sending, consentConfirmed])
 
   // Handle Gmail OAuth callback (?gmail_connected=1&gmail_session=...&gmail_email=...)
   useEffect(() => {
@@ -77,6 +80,14 @@ export default function Step5Send({ data, setData, prevStep }) {
 
   const handleSend = async () => {
     if (!data.gmailTokens || !emails.length) return
+    if (emails.length > 10) {
+      toast.error("Maximum 10 recipients allowed per sending action.")
+      return
+    }
+    if (!consentConfirmed) {
+      toast.error("Consent confirmation is required.")
+      return
+    }
     setSending(true)
     try {
       const payload = emails.map((e) => ({
@@ -85,13 +96,15 @@ export default function Step5Send({ data, setData, prevStep }) {
         body: e.body,
         contact_name: e.contact.name,
       }))
+      const { data: { session } } = await supabase.auth.getSession()
       const res = await sendEmails({
         token_data: data.gmailTokens,
         from_name: fromName || (data.gmailEmail ? data.gmailEmail.split('@')[0] : ''),
         from_email: data.gmailEmail,
         emails: payload,
         resume_file_path: data.resumeFilePath || null,
-      })
+        consent_confirmed: true,
+      }, session?.access_token)
       setResults([])
       toast.success(res.data.message || 'Campaign queued successfully')
     } catch (err) {
@@ -176,7 +189,26 @@ export default function Step5Send({ data, setData, prevStep }) {
       )}
 
       {!results ? (
-        <div className="space-y-3">
+        <div className="space-y-4">
+          {/* Sending limits notice */}
+          <div className="rounded-xl border border-[var(--border)] bg-[var(--bg3)] p-3 text-xs text-[var(--text3)]">
+            Sending limits help maintain compliance and sender reputation. Maximum 10 recipients per action, and 100 emails per user daily.
+          </div>
+
+          {/* Required Consent Checkbox */}
+          <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg3)] p-3">
+            <input
+              id="send-consent"
+              type="checkbox"
+              checked={consentConfirmed}
+              onChange={(e) => setConsentConfirmed(e.target.checked)}
+              className="h-4 w-4 rounded border-[var(--border2)] bg-[var(--bg2)] text-[var(--accent)] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+            />
+            <label htmlFor="send-consent" className="text-xs text-[var(--text2)] font-semibold select-none cursor-pointer">
+              I confirm that all recipients have explicitly consented to receive communications from me.
+            </label>
+          </div>
+
           <button
             className="inline-flex w-full items-center justify-center gap-2 rounded-xl bg-[var(--accent)] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[var(--accent2)] disabled:opacity-50"
             onClick={handleSend}

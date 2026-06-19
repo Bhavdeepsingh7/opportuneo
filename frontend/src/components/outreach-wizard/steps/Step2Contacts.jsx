@@ -3,12 +3,14 @@ import { useDropzone } from 'react-dropzone'
 import { AlertCircle, ArrowRight, FileSpreadsheet, Trash2, Users } from 'lucide-react'
 import toast from 'react-hot-toast'
 import { parseContacts } from '../../../lib/api'
+import { supabase } from '../../../lib/supabase'
 import './Step2Contacts.css'
 
 export default function Step2Contacts({ data, setData, nextStep, prevStep }) {
   const [file, setFile] = useState(null)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
+  const [consentConfirmed, setConsentConfirmed] = useState(false)
 
   const contacts = useMemo(() => (Array.isArray(data.contacts) ? data.contacts : []), [data.contacts])
 
@@ -30,11 +32,18 @@ export default function Step2Contacts({ data, setData, nextStep, prevStep }) {
   const handleParse = async () => {
     if (!file) return
     setError('')
+    if (!consentConfirmed) {
+      setError('You must confirm that these contacts have opted in to receive communications.')
+      toast.error('Consent confirmation required')
+      return
+    }
     setLoading(true)
     try {
+      const { data: { session } } = await supabase.auth.getSession()
       const fd = new FormData()
       fd.append('file', file)
-      const { data: res } = await parseContacts(fd)
+      fd.append('consent_confirmed', 'true')
+      const { data: res } = await parseContacts(fd, session?.access_token)
       setData({ contacts: res.contacts })
       toast.success(`${res.count || res.contacts?.length || 0} contacts loaded`)
     } catch (err) {
@@ -91,6 +100,20 @@ export default function Step2Contacts({ data, setData, nextStep, prevStep }) {
           </div>
           <div className="text-xs text-[var(--text3)]">CSV or PDF — click to browse</div>
         </div>
+      </div>
+
+      {/* Required Consent Checkbox */}
+      <div className="flex items-center gap-2 rounded-xl border border-[var(--border)] bg-[var(--bg3)] p-3">
+        <input
+          id="upload-consent"
+          type="checkbox"
+          checked={consentConfirmed}
+          onChange={(e) => setConsentConfirmed(e.target.checked)}
+          className="h-4 w-4 rounded border-[var(--border2)] bg-[var(--bg2)] text-[var(--accent)] focus:ring-0 focus:ring-offset-0 cursor-pointer"
+        />
+        <label htmlFor="upload-consent" className="text-xs text-[var(--text2)] font-semibold select-none cursor-pointer">
+          I confirm these contacts have opted in to receive communications.
+        </label>
       </div>
 
       {error && (

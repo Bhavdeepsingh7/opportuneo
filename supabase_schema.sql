@@ -186,3 +186,26 @@ create index on public.resumes         (user_id);
 create index on public.contacts        (campaign_id);
 create index on public.generated_emails (campaign_id);
 create index on public.generated_emails (user_id, status);
+
+-- ============================================================
+-- Audit Logs
+-- ============================================================
+create table public.audit_logs (
+  id          uuid primary key default uuid_generate_v4(),
+  user_id     uuid references auth.users(id) on delete cascade not null,
+  action      text not null,
+  timestamp   timestamptz not null default now(),
+  metadata    jsonb not null default '{}'::jsonb
+);
+
+-- Enable Row Level Security (RLS)
+alter table public.audit_logs enable row level security;
+
+-- Policies (Users can insert and read their own audit logs)
+create policy "Users can view own audit logs" on public.audit_logs for select using (auth.uid() = user_id);
+create policy "Users can insert own audit logs" on public.audit_logs for insert with check (auth.uid() = user_id);
+
+-- Indexes
+create index on public.audit_logs (user_id);
+create index on public.audit_logs (action);
+create index on public.audit_logs (timestamp);

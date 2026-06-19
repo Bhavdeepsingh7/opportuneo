@@ -1,5 +1,5 @@
 import { useMemo, useState } from 'react'
-import { Check } from 'lucide-react'
+import { Check, ShieldAlert } from 'lucide-react'
 import { useAppState } from '../../context/AppContext'
 
 import Step1Resume from './steps/Step1Resume'
@@ -11,9 +11,9 @@ import "./OutreachWizard.css"
 
 
 const STEPS = [
-  'Upload Resume',
+  'Upload Background',
   'Upload Contacts',
-  'Configure Outreach',
+  'Configure Campaign',
   'Review Emails',
   'Send Emails',
 ]
@@ -120,11 +120,19 @@ export default function OutreachWizard() {
   return (
     <div className="oa-wizard w-full py-10">
       <div className="oa-wizard-shell mx-auto w-full max-w-5xl px-6">
+        {/* Compliance Banner */}
+        <div className="mb-6 flex items-start gap-3 rounded-2xl border border-[rgba(109,95,255,.25)] bg-[rgba(109,95,255,.05)] px-4 py-3.5 text-xs text-[var(--text2)] shadow-sm">
+          <ShieldAlert size={16} className="text-[var(--accent)] shrink-0 mt-0.5" />
+          <div>
+            <strong className="text-[var(--text)]">Compliance Notice:</strong> Opportuneo may only be used to communicate with recipients who have explicitly consented to receive emails. Unsolicited commercial email is prohibited.
+          </div>
+        </div>
+
         <div className="oa-wizard-header mb-6 flex flex-col gap-2">
           <div className="flex items-end justify-between gap-4">
             <div>
               <h1 className="text-2xl font-semibold tracking-tight text-[var(--text)]">
-                Outreach campaign wizard
+                Email campaign assistant
               </h1>
               <p className="text-sm text-[var(--text2)]">
                 Complete each step in order — we’ll carry your data through the flow.

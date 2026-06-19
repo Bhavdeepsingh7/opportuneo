@@ -35,7 +35,7 @@ def should_fallback_to_groq(error: Exception) -> bool:
         return True
     return False
 
-SYSTEM_PROMPT = """You are an expert career coach writing personalized job outreach emails.
+SYSTEM_PROMPT = """You are an expert assistant writing personalized emails.
 
 Rules:
 - SPECIFIC: Reference at least one real detail about the company or their role
@@ -264,7 +264,7 @@ Important correction:
                     {"role": "system", "content": SYSTEM_PROMPT},
                     {
                         "role": "user",
-                        "content": f"""Generate a personalized outreach email.
+                        "content": f"""Generate a personalized email.
 
 RECIPIENT:
 Name: {contact.name}
@@ -302,7 +302,7 @@ Return JSON:
                             {"role": "system", "content": SYSTEM_PROMPT},
                             {
                                 "role": "user",
-                                "content": f"""Generate a personalized outreach email.
+                                "content": f"""Generate a personalized email.
 
 RECIPIENT:
 Name: {contact.name}
@@ -386,7 +386,7 @@ Summary: {resume_data.get('summary', '')}
                 {"role": "system", "content": SYSTEM_PROMPT},
                 {
                     "role": "user",
-                    "content": f"""Regenerate the outreach email with improvements.
+                    "content": f"""Regenerate the email with improvements.
 
 RECIPIENT: {contact.name} | {contact.title} @ {contact.company}
 SENDER: {profile}
@@ -416,7 +416,7 @@ Return JSON:
                         {"role": "system", "content": SYSTEM_PROMPT},
                         {
                             "role": "user",
-                            "content": f"""Regenerate the outreach email with improvements.
+                            "content": f"""Regenerate the email with improvements.
 
 RECIPIENT: {contact.name} | {contact.title} @ {contact.company}
 SENDER: {profile}

@@ -14,8 +14,8 @@ async def lifespan(_app: FastAPI):
     await close_rabbitmq()
 
 app = FastAPI(
-    title="OutreachAI API",
-    description="AI-powered job outreach email generator",
+    title="Opportuneo API",
+    description="AI-powered email assistant",
     version="1.0.0",
     lifespan=lifespan,
 )
@@ -40,7 +40,7 @@ app.include_router(users.router,    prefix="/api")
 
 @app.get("/")
 def root():
-    return {"status": "ok", "service": "OutreachAI API"}
+    return {"status": "ok", "service": "Opportuneo API"}
 
 @app.get("/health")
 def health():

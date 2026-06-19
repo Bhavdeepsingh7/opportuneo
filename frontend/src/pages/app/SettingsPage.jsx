@@ -215,7 +215,7 @@ export default function SettingsPage() {
               <div className="icon-box gmail"><Mail size={20} /></div>
               <div className="header-text">
                 <h3>Gmail Connection</h3>
-                <p>Used to send outreach emails from your personal account.</p>
+                <p>Used to send personalized emails from your personal account.</p>
               </div>
             </div>
             

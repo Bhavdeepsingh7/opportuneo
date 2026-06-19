@@ -19,12 +19,12 @@ const plans = [
     name: 'Starter',
     monthly: 499,
     messageLimit: 1000,
-    description: 'For individual job seekers sending focused recruiter and hiring manager outreach.',
+    description: 'For individuals sending focused, personalized emails.',
     cta: 'Start Starter',
     features: [
       '1,000 email credits per month',
-      'AI-personalized job outreach emails',
-      'Resume-aware message generation',
+      'AI-personalized emails',
+      'Context-aware message generation',
       'CSV contact upload',
       'Gmail sending workflow',
     ],
@@ -34,13 +34,13 @@ const plans = [
     name: 'Pro',
     monthly: 1499,
     messageLimit: 5000,
-    description: 'For active job seekers running larger outreach campaigns across roles and companies.',
+    description: 'For active users running larger email campaigns.',
     cta: 'Start Pro',
     featured: true,
     features: [
       '5,000 email credits per month',
-      'Advanced recruiter personalization',
-      'Multiple job-context campaigns',
+      'Advanced contact personalization',
+      'Multiple campaign contexts',
       'Follow-up sequence support',
       'Priority email support',
       'Campaign analytics',
@@ -51,15 +51,15 @@ const plans = [
     name: 'Agency',
     monthly: 3999,
     messageLimit: 20000,
-    description: 'For resume writers, career coaches, and placement teams handling outreach for many candidates.',
+    description: 'For communication teams and agencies handling email campaigns for multiple clients.',
     cta: 'Start Agency',
     features: [
       '20,000 email credits per month',
-      'Candidate-wise campaign organization',
+      'Client-wise campaign organization',
       'Bulk personalization workflow',
-      'Reusable outreach templates',
+      'Reusable email templates',
       'Priority support',
-      'High-volume job outreach analytics',
+      'High-volume campaign analytics',
     ],
   },
 ]
@@ -67,11 +67,11 @@ const plans = [
 const faqs = [
   ['Can I cancel anytime?', 'Yes. You can cancel or change your plan anytime from billing settings. Your remaining monthly credits stay available until the billing cycle ends.'],
   ['Can I buy extra email credits?', 'Yes. Extra credits cost Rs 1 per credit, with a minimum purchase of 50 credits.'],
-  ['What counts as one credit?', 'One generated or sent job outreach email uses one email credit.'],
-  ['Can I upgrade later?', 'Absolutely. Upgrades are instant, and your campaigns, contacts, and job-context settings move with you.'],
+  ['What counts as one credit?', 'One generated or sent email uses one email credit.'],
+  ['Can I upgrade later?', 'Absolutely. Upgrades are instant, and your campaigns, contacts, and custom settings move with you.'],
 ]
 
-const outcomes = ['Recruiters', 'Hiring Managers', 'Founders', 'Talent Teams', 'Referrals']
+const outcomes = ['Clients', 'Customers', 'Applicants', 'Subscribers', 'Consented Recipients']
 
 const fadeUp = {
   hidden: { opacity: 0, y: 24 },
@@ -171,13 +171,13 @@ function CustomCreditsCard() {
         plan: {
           id: `custom-credits-${normalizedCredits}`,
           name: 'Custom email credits',
-          description: `${normalizedCredits.toLocaleString('en-IN')} extra job outreach email credits at Rs 1 per credit.`,
+          description: `${normalizedCredits.toLocaleString('en-IN')} extra email credits at Rs 1 per credit.`,
           monthlyPrice: total,
           features: [
             `${normalizedCredits.toLocaleString('en-IN')} extra email credits`,
             'Rs 1 per credit',
             'Credits added after successful payment',
-            'Use for job outreach email generation and sending',
+            'Use for email generation and sending',
           ],
           messageLimit: normalizedCredits,
         },
@@ -195,7 +195,7 @@ function CustomCreditsCard() {
           </div>
           <h2 className="mt-5 text-2xl font-semibold text-white sm:text-3xl">Buy custom email credits</h2>
           <p className="mt-3 text-sm leading-6 text-[var(--text2)]">
-            Need more job outreach volume this month? Buy extra credits anytime. Each credit costs Rs 1.
+            Need more email volume this month? Buy extra credits anytime. Each credit costs Rs 1.
           </p>
         </div>
 
@@ -283,13 +283,13 @@ export default function SubscriptionPage() {
         >
           <Motion.div variants={fadeUp} className="pricing-eyebrow mx-auto inline-flex items-center gap-2 rounded-full px-4 py-2 text-xs font-semibold text-[var(--accent3)]">
             <Sparkles size={14} />
-            AI-native job outreach
+            AI-native email assistant
           </Motion.div>
           <Motion.h1 variants={fadeUp} className="mt-7 text-4xl font-semibold tracking-tight text-white sm:text-6xl lg:text-7xl width-100">
-            Land More Interviews with Smarter Outreach
+            Connect Better with Smarter Emails
           </Motion.h1>
           <Motion.p variants={fadeUp} className="mx-auto mt-6 text-base leading-8 text-[var(--text2)] sm:text-lg width-100">
-            Generate resume-aware emails, reach recruiters faster, and manage job outreach credits from one focused workspace.
+            Generate personalized emails, connect faster, and manage email credits from one focused workspace.
           </Motion.p>
           <Motion.div variants={fadeUp} className="mt-9 flex flex-col items-center justify-center gap-3 sm:flex-row">
             <span className="save-badge rounded-full px-4 py-2 text-xs font-semibold text-[var(--green)]">
@@ -314,8 +314,8 @@ export default function SubscriptionPage() {
 
         <Motion.section variants={stagger} initial="hidden" whileInView="show" viewport={{ once: true, amount: 0.2 }} className="mt-20">
           <Motion.div variants={fadeUp} className="text-center">
-            <h2 className="text-2xl font-semibold text-white sm:text-3xl">Built for modern job search outreach</h2>
-            <p className="mt-3 text-sm text-[var(--text2)]">Reach the people who can actually move your application forward.</p>
+            <h2 className="text-2xl font-semibold text-white sm:text-3xl">Built for modern email campaigns</h2>
+            <p className="mt-3 text-sm text-[var(--text2)]">Reach the people you want to connect with.</p>
           </Motion.div>
           <Motion.div variants={fadeUp} className="mt-8 grid grid-cols-2 gap-3 sm:grid-cols-5">
             {outcomes.map((outcome) => (
@@ -369,10 +369,10 @@ export default function SubscriptionPage() {
           />
           <div className="relative z-10 mx-auto">
             <h2 className="text-3xl font-semibold tracking-tight text-white sm:text-5xl width-100">
-              Start your next job outreach campaign
+              Start your next campaign
             </h2>
             <p className="mx-auto mt-4 text-sm leading-7 text-[var(--text2)] width-100">
-              Upload contacts, add your job context, and send personalized emails that sound like you.
+              Upload contacts, add your custom context, and send personalized emails that sound like you.
             </p>
             <button 
               type="button" 

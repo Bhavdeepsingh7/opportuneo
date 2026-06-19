@@ -1,5 +1,5 @@
 import { Link } from 'react-router-dom'
-import { ArrowRight, CheckCircle2, Coins, MailCheck, ShieldCheck, Sparkles, UploadCloud } from 'lucide-react'
+import { ArrowRight, CheckCircle2, Coins, MailCheck, ShieldCheck, Sparkles, UploadCloud, Users } from 'lucide-react'
 import logo from '../assets/logo.png'
 import Footer from '../components/Footer'
 import heroImage from '../assets/hero.png'
@@ -7,27 +7,32 @@ import './LandingPage.css'
 
 const features = [
   {
-    icon: UploadCloud,
-    title: 'Resume-aware personalization',
-    copy: 'Upload your resume and add job context so every email reflects your skills, target role, and intent.',
+    icon: Sparkles,
+    title: 'Personalized email drafting',
+    copy: 'Upload your background profile or resume so every email reflects your skills, target role, and intent.',
+  },
+  {
+    icon: Users,
+    title: 'Contact management',
+    copy: 'Organize and manage your consented contact list for personalized communication campaigns.',
   },
   {
     icon: MailCheck,
-    title: 'Recruiter-ready outreach',
-    copy: 'Generate clear, concise emails for recruiters, hiring managers, founders, and referral contacts.',
+    title: 'Gmail integration',
+    copy: 'Securely link your Gmail account to send personalized messages directly from your personal inbox.',
   },
   {
-    icon: Coins,
-    title: 'Simple email credits',
-    copy: 'Starter, Pro, and Agency plans include monthly credits. Extra credits cost Rs 1.',
+    icon: ShieldCheck,
+    title: 'Human-reviewed sending',
+    copy: 'Review every generated email draft in an editable composer before manually approving and sending.',
   },
 ]
 
 const steps = [
-  'Upload your resume',
-  'Import recruiter or company contacts',
-  'Add the role and job context',
-  'Generate and send personalized outreach',
+  'Upload your background profile or resume',
+  'Import consented contact list',
+  'Add custom communication context',
+  'Review and manually send personalized emails',
 ]
 
 const plans = [
@@ -56,11 +61,11 @@ export default function LandingPage() {
         <div className="landing-hero__content">
           <div className="landing-eyebrow">
             <Sparkles size={14} />
-            AI job outreach workspace
+            AI Email Assistant
           </div>
-          <h1>Turn job opportunities into warm conversations.</h1>
+          <h1>AI-Powered Email Assistant for Meaningful Communication</h1>
           <p>
-            Opportuneo helps job seekers, career coaches, and placement teams generate resume-aware outreach emails for recruiters, hiring managers, and referral contacts.
+            Generate personalized emails for clients, customers, applicants, and subscribers using AI.
           </p>
           <div className="landing-actions">
             <Link to="/auth?mode=signup" className="landing-button landing-button--primary">
@@ -81,8 +86,8 @@ export default function LandingPage() {
               <strong>Frontend roles</strong>
             </div>
             <div className="landing-preview__message">
-              <span>To: hiring.manager@company.com</span>
-              <p>Your React work, portfolio, and role context are ready for a concise outreach draft.</p>
+              <span>To: contact@company.com</span>
+              <p>Your background, skills, and target context are ready for a personalized email draft.</p>
             </div>
             <div className="landing-preview__meter">
               <span>Credits available</span>
@@ -94,8 +99,8 @@ export default function LandingPage() {
 
       <section id="features" className="landing-section">
         <div className="landing-section__heading">
-          <h2>Everything you need for focused job outreach.</h2>
-          <p>Replace generic cold emails with targeted messages built from your profile, contacts, and goals.</p>
+          <h2>Everything you need for focused email communication.</h2>
+          <p>Replace generic emails with targeted messages built from your profile, contacts, and custom goals.</p>
         </div>
         <div className="landing-feature-grid">
           {features.map((feature) => {
@@ -114,8 +119,8 @@ export default function LandingPage() {
 
       <section className="landing-workflow">
         <div>
-          <h2>From resume to outreach in minutes.</h2>
-          <p>Opportuneo keeps the workflow practical: bring your resume, contacts, and job target, then review the generated emails before sending.</p>
+          <h2>From profile to email in minutes.</h2>
+          <p>Opportuneo keeps the workflow practical: bring your background, contacts, and target context, then review the generated emails before sending.</p>
         </div>
         <ol>
           {steps.map((step) => (
@@ -129,7 +134,7 @@ export default function LandingPage() {
 
       <section id="pricing" className="landing-section">
         <div className="landing-section__heading">
-          <h2>Simple pricing for every outreach volume.</h2>
+          <h2>Simple pricing for every communication volume.</h2>
           <p>Buy extra credits anytime with a minimum purchase of 50 credits.</p>
         </div>
         <div className="landing-plan-grid">
@@ -145,7 +150,7 @@ export default function LandingPage() {
 
       <section className="landing-cta">
         <ShieldCheck size={22} />
-        <h2>Build a better job search pipeline today.</h2>
+        <h2>Build better email connections today.</h2>
         <p>Secure signup, focused checkout, and instant plan activation after successful payment.</p>
         <Link to="/auth?mode=signup" className="landing-button landing-button--primary">
           Create your account

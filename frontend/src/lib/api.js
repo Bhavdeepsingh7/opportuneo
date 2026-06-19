@@ -12,8 +12,13 @@ export const parseResume = (formData) =>
   api.post('/resume/parse', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
 
 // Contacts
-export const parseContacts = (formData) =>
-  api.post('/contacts/parse', formData, { headers: { 'Content-Type': 'multipart/form-data' } })
+export const parseContacts = (formData, accessToken) =>
+  api.post('/contacts/parse', formData, {
+    headers: {
+      Authorization: `Bearer ${accessToken}`,
+      'Content-Type': 'multipart/form-data',
+    },
+  })
 
 // Emails
 export const generateEmails = (data, accessToken) =>
@@ -24,7 +29,10 @@ export const regenerateEmail = (data, accessToken) =>
   api.post('/emails/regenerate', data, {
     headers: { Authorization: `Bearer ${accessToken}` },
   })
-export const sendEmails = (data) => api.post('/emails/send', data)
+export const sendEmails = (data, accessToken) =>
+  api.post('/emails/send', data, {
+    headers: { Authorization: `Bearer ${accessToken}` },
+  })
 
 // Gmail OAuth
 export const getGmailAuthUrl  = async () => {
