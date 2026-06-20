@@ -73,9 +73,9 @@ export default function Step2Contacts({ data, setData, nextStep, prevStep }) {
         </p>
       </div>
 
-      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-4">
-        <div className="text-xs font-semibold text-[var(--text2)] padding-5px">CSV format</div>
-        <div className="mt-1 text-sm text-[var(--text3)] padding-5px">
+      <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-4 space-y-1">
+        <div className="text-xs font-semibold text-[var(--text2)]">CSV format</div>
+        <div className="text-sm text-[var(--text3)]">
           Columns: <span className="text-[var(--text2)]">name</span>, <span className="text-[var(--text2)]">email</span>,{' '}
           <span className="text-[var(--text2)]">company</span>, <span className="text-[var(--text2)]">title</span>
         </div>

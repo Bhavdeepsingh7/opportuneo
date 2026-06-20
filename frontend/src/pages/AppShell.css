@@ -237,6 +237,7 @@
   .logo-label,
   .nav-item span,
   .subscription-pill,
+  .user-pill-info,
   .user-info,
   .step-label-text { display: none; }
   .nav-item { justify-content: center; padding: 10px; }

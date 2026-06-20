@@ -111,7 +111,7 @@
 }
 
 .user-info { display: flex; flex-direction: column; min-width: 0; }
-.user-email { font-size: 12px; font-weight: 600; color: var(--text); truncate: ellipsis; overflow: hidden; white-space: nowrap; }
+.user-email { font-size: 12px; font-weight: 600; color: var(--text); text-overflow: ellipsis; overflow: hidden; white-space: nowrap; }
 .user-plan { font-size: 11px; color: var(--text3); }
 
 .sign-out-btn { width: 100%; justify-content: center; }

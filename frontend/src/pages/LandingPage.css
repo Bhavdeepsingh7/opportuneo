@@ -79,7 +79,7 @@
 .landing-hero {
   display: grid;
   grid-template-columns: minmax(0, 1fr) minmax(360px, 500px);
-  gap: 48px;
+  gap: 18px;
   align-items: center;
   width: min(100%, 1180px);
   margin: 0 auto;

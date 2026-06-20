@@ -193,7 +193,7 @@ export default function OutreachWizard() {
                 )
               })}
             </div>
-            <div className="mt-2 text-xs text-[var(--text3)] step" >
+            <div className="mt-2 text-xs text-[var(--text3)] pl-2.5" >
               Step {safeCurrentStep + 1} of 5
             </div>
           </div>

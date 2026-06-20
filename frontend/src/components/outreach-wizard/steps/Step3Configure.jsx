@@ -74,13 +74,13 @@ export default function Step3Configure({ data, setData, nextStep, prevStep }) {
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-4 padding-5px">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-4">
           <div className="text-xs font-semibold text-[var(--text3)]">Resume</div>
           <div className="mt-1 text-sm font-semibold text-[var(--text)]">
             {data.resumeData?.name || '—'} · {data.resumeData?.current_title || '—'}
           </div>
         </div>
-        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-4 padding-5px">
+        <div className="rounded-2xl border border-[var(--border)] bg-[var(--bg3)] p-4">
           <div className="text-xs font-semibold text-[var(--text3)]">Contacts</div>
           <div className="mt-1 text-sm font-semibold text-[var(--text)]">
             {contactCount} recipients
